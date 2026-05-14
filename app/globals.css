@@ -1,26 +1,87 @@
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Manrope:wght@300;400;500;600;700;800&display=swap');
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --bg: #1B1B1F;
+  --s1: #232327;
+  --s2: #2A2A2F;
+  --s3: #323238;
+  --border: #38383F;
+  --lime: #C8FF4D;
+  --lime-dim: #A8D935;
+  --purple: #7B6EF5;
+  --purple-dim: rgba(123, 110, 245, 0.4);
+  --t1: #FFFFFF;
+  --t2: #9898A5;
+  --t3: #55555F;
+  --grn: #4ADE80;
+  --red: #F87171;
+  --font-manrope: 'Manrope', sans-serif;
+  --font-outfit: 'Outfit', sans-serif;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
+  --color-background: var(--bg);
+  --color-foreground: var(--t1);
+  --color-bg: var(--bg);
+  --color-s1: var(--s1);
+  --color-s2: var(--s2);
+  --color-s3: var(--s3);
+  --color-border: var(--border);
+  --color-lime: var(--lime);
+  --color-lime-dim: var(--lime-dim);
+  --color-purple: var(--purple);
+  --color-purple-dim: var(--purple-dim);
+  --color-t1: var(--t1);
+  --color-t2: var(--t2);
+  --color-t3: var(--t3);
+  --color-grn: var(--grn);
+  --color-red: var(--red);
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --font-sans: var(--font-manrope);
+  --font-outfit: var(--font-outfit);
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background-color: var(--bg);
+  color: var(--t1);
+  font-family: var(--font-sans);
+}
+
+/* Base custom utility classes */
+.glass-panel {
+  background: var(--s1);
+  border: 1px solid var(--border);
+  border-radius: 18px;
+}
+
+.input-field {
+  background: var(--s2);
+  border: 1px solid var(--border);
+  border-radius: 9px;
+  color: var(--t1);
+  font-family: var(--font-sans);
+  transition: border-color 0.18s;
+  outline: none;
+}
+
+.input-field::placeholder {
+  color: var(--t3);
+}
+
+.input-field:focus {
+  border-color: var(--purple);
+}
+
+.auth-btn-primary {
+  background: var(--lime);
+  color: #111117;
+  font-family: var(--font-sans);
+  font-weight: 600;
+  transition: background 0.18s;
+  border-radius: 9px;
+}
+
+.auth-btn-primary:hover {
+  background: var(--lime-dim);
 }
