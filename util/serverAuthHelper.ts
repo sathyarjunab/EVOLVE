@@ -11,7 +11,7 @@ export async function getUser() {
   try {
     const secret = new TextEncoder().encode(process.env.JWT_SECRET);
     const { payload } = await jwtVerify(token, secret);
-    return payload;
+    return payload as UserModel;
   } catch (err) {
     return null;
   }

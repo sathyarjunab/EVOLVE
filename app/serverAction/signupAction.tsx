@@ -7,9 +7,9 @@ import { signupSchema } from "@/util/validator"
 import bcrypt from "bcryptjs"
 import { cookies } from "next/headers"
 
-export default async function signup(name: string, email: string, password: string) {
+export default async function signup(name: string, email: string, password: string, timezone?: string) {
     try {
-        const data = await signupSchema.parseAsync({ name, email, password })
+        const data = await signupSchema.parseAsync({ name, email, password, timezone })
         const user = await prisma.user.findUnique({
             where: {
                 email: data.email,
@@ -30,7 +30,8 @@ export default async function signup(name: string, email: string, password: stri
             data: {
                 name: data.name,
                 email: data.email,
-                password: hashedPassword
+                password: hashedPassword,
+                timezone: data.timezone || "UTC"
             }
         })
 
@@ -43,6 +44,10 @@ export default async function signup(name: string, email: string, password: stri
             path: '/',
             maxAge: 60 * 60 * 24 * 7,
         })
+        return {
+            success: true,
+            message: "User created successfully"
+        }
     } catch (err) {
         if (err instanceof AppError) {
             return {

@@ -1,15 +1,14 @@
 "use client"
 
-import { UserModel } from '@/app/generated/prisma/models';
+import signup from '@/app/serverAction/signupAction';
 import { SignupSchema, signupSchema } from '@/util/validator';
 import { zodResolver } from '@hookform/resolvers/zod';
-import Link from 'next/link';
-import { useForm } from 'react-hook-form';
-import { useState } from 'react';
 import { Eye, EyeOff } from 'lucide-react';
-import signup from '@/app/serverAction/signupAction';
-import { toast } from 'sonner';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { toast } from 'sonner';
 
 export default function SignupPage() {
   const [showPassword, setShowPassword] = useState(false);
@@ -25,9 +24,10 @@ export default function SignupPage() {
   const router = useRouter()
 
 
-  async function login(data: SignupSchema) {
+    async function onSubmit(data: SignupSchema) {
     try {
-      const res = await signup(data.name, data.email, data.password)
+      const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+      const res = await signup(data.name, data.email, data.password, timezone)
       if (res?.success) {
         toast.success(res.message)
         router.push("/")
@@ -62,7 +62,7 @@ export default function SignupPage() {
           Join HabitFlow and upgrade your daily routine.
         </p>
 
-        <form className="space-y-4" onSubmit={handleSubmit(login)}>
+        <form className="space-y-4" onSubmit={handleSubmit(onSubmit)}>
           <div>
             <label className="block text-[0.7rem] font-bold text-t2 mb-1.5 uppercase tracking-wider">Full Name</label>
             <input

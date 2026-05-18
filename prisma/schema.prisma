@@ -1,8 +1,6 @@
 // This is your Prisma schema file,
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
-// Get a free hosted Postgres database in seconds: `npx create-db`
-
 generator client {
   provider = "prisma-client"
   output   = "../app/generated/prisma"
@@ -12,17 +10,156 @@ datasource db {
   provider = "postgresql"
 }
 
+// ═══════════════════════════════════════════════════════════════
+// ENUMS
+// ═══════════════════════════════════════════════════════════════
+
+enum TimeOfDay {
+  morning
+  afternoon
+  evening
+  anytime
+}
+
+enum TrackerType {
+  habit_tracker
+  money_tracker
+}
+
+enum accessType {
+  habit_tracker
+  money_tracker
+}
+
+// ═══════════════════════════════════════════════════════════════
+// USERS
+// Core identity only. No tracker-specific data here.
+// access JSON shape: { habit_tracker: true, money_tracker: false }
+// ═══════════════════════════════════════════════════════════════
+
 model User {
-  id                String    @id @default(cuid())
+  id         String   @id @default(uuid())
+  name       String   @db.VarChar(80)
+  email      String   @unique @db.VarChar(255)
+  password   String   @db.VarChar(255) // store hashed, never plain
+  timezone   String   @default("UTC") @db.VarChar(60)
+  access     Json @default("{\"habit_tracker\":false,\"money_tracker\":false}")
+  lastLogin  DateTime? @map("last_login")
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @updatedAt @map("updated_at")
 
-  name              String?
-  email             String    @unique
-  password          String
+  // Relations
+  habits        Habit[]
+  habitLogs     HabitLog[]
+  dailySummaries DailySummary[]
+  trackerStats  TrackerStats[]
 
-  createdAt         DateTime  @default(now())
-  updatedAt         DateTime  @updatedAt
+  @@map("users")
+}
 
-  lastLoginAt       DateTime?
+// ═══════════════════════════════════════════════════════════════
+// HABITS
+// Soft delete via isActive. No streak stored here —
+// streak is computed from HabitLog, cached in TrackerStats.
+// ═══════════════════════════════════════════════════════════════
 
-  @@index([email])
+model Habit {
+  id         String    @id @default(uuid())
+  userId     String    @map("user_id")
+  name       String    @db.VarChar(80)
+  icon       String    @db.VarChar(8)  // single emoji
+  timeOfDay  TimeOfDay @map("time_of_day")
+  sortOrder  Int       @default(0) @map("sort_order") @db.SmallInt
+  isActive   Boolean   @default(true) @map("is_active")
+  createdAt  DateTime  @default(now()) @map("created_at")
+  updatedAt  DateTime  @updatedAt @map("updated_at")
+
+  // Relations
+  user       User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  habitLogs  HabitLog[]
+
+  @@index([userId, isActive], name: "idx_habits_user_active")
+  @@index([userId, sortOrder], name: "idx_habits_user_order")
+  @@map("habits")
+}
+
+// ═══════════════════════════════════════════════════════════════
+// HABIT LOGS
+// One row per habit per day. completed = false means the row
+// exists but habit wasn't done. This lets us distinguish
+// "tracked but skipped" vs "not yet tracked today".
+// ═══════════════════════════════════════════════════════════════
+
+model HabitLog {
+  id          String   @id @default(uuid())
+  habitId     String   @map("habit_id")
+  userId      String   @map("user_id") // denormalized for faster queries
+  logDate     DateTime @map("log_date") @db.Date
+  completedAt DateTime? @map("completed_at") // exact timestamp when toggled done
+
+  // Relations
+  habit       Habit    @relation(fields: [habitId], references: [id], onDelete: Cascade)
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // One row per habit per day — enforced at DB level
+  @@unique([habitId, logDate], name: "uq_habit_log_date")
+
+  @@index([userId, logDate(sort: Desc)], name: "idx_logs_user_date")
+  @@index([habitId, logDate(sort: Desc)], name: "idx_logs_habit_date")
+  @@index([userId, logDate, habitId], name: "idx_logs_covering")
+  @@map("habit_logs")
+}
+
+// ═══════════════════════════════════════════════════════════════
+// DAILY SUMMARY
+// Pre-aggregated per user per day. Powers bar chart,
+// line chart, and heatmap without any GROUP BY on hot path.
+// Upserted every time a HabitLog is toggled.
+// ═══════════════════════════════════════════════════════════════
+
+model DailySummary {
+  userId          String   @map("user_id")
+  summaryDate     DateTime @map("summary_date") @db.Date
+  totalHabits     Int      @default(0) @map("total_habits") @db.SmallInt
+  completedCount  Int      @default(0) @map("completed_count") @db.SmallInt
+  completionPct   Int      @default(0) @map("completion_pct") @db.SmallInt // 0–100
+
+  // Relations
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([userId, summaryDate])
+  @@index([userId, summaryDate(sort: Desc)], name: "idx_daily_user_date")
+  @@map("daily_summaries")
+}
+
+// ═══════════════════════════════════════════════════════════════
+// TRACKER STATS
+// One row per user per tracker type.
+// stats JSON shape for habit_tracker:
+// {
+//   globalStreak: number,
+//   bestGlobalStreak: number,
+//   totalAllTime: number,
+//   lastActiveDate: "YYYY-MM-DD"
+// }
+// stats JSON shape for money_tracker (future):
+// {
+//   totalSaved: number,
+//   currentMonth: number,
+//   ...
+// }
+// Pulled OUT of users table to avoid write contention.
+// ═══════════════════════════════════════════════════════════════
+
+model TrackerStats {
+  userId      String      @map("user_id")
+  trackerType TrackerType @map("tracker_type")
+  stats       Json        @default("{}")
+  updatedAt   DateTime    @updatedAt @map("updated_at")
+
+  // Relations
+  user        User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([userId, trackerType])
+  @@map("tracker_stats")
 }
