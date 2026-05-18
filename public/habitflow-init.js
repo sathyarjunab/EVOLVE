@@ -632,7 +632,7 @@ function renderHabits() {
         <div class="h-sub">${h.time} · 🔥 ${h.streak} day streak</div>
       </div>
       <div class="h-streak">${done ? '✓ Done' : 'Pending'}</div>
-      <button class="h-edit" title="Edit" onclick="openModal(${h.id});event.stopPropagation()">
+      <button class="h-edit" title="Edit" onclick="openModal('${h.id}');event.stopPropagation()">
         <svg width="11" height="11" viewBox="0 0 11 11" fill="none"><path d="M7.5 1.5l2 2-6 6H1.5v-2l6-6Z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/></svg>
       </button>
       <div class="h-check">
@@ -692,7 +692,7 @@ function renderHabitsForPeriod(yr, mo) {
         <div class="h-sub">${h.time} · ${MONTHS_SHORT[mo]} ${yr}</div>
       </div>
       <div class="h-streak" style="color:${rate >= 70 ? 'var(--lime)' : rate >= 40 ? 'var(--t2)' : 'var(--red)'}">${rate}%</div>
-      <button class="h-edit" title="Edit" onclick="openModal(${h.id});event.stopPropagation()">
+      <button class="h-edit" title="Edit" onclick="openModal('${h.id}');event.stopPropagation()">
         <svg width="11" height="11" viewBox="0 0 11 11" fill="none"><path d="M7.5 1.5l2 2-6 6H1.5v-2l6-6Z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/></svg>
       </button>
     `;
@@ -745,6 +745,7 @@ function buildEmojiGrid(current = '🎯') {
 }
 
 function openModal(id) {
+  console.log("openModal")
   editId = id ?? null;
   const isEdit = !!editId;
   document.getElementById('mTitleText').textContent = isEdit ? 'Edit Habit' : 'New Habit';

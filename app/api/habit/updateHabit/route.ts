@@ -19,7 +19,7 @@ export async function PUT(req: NextRequest) {
             name: z.string().min(1),
             icon: z.string().min(1),
             time: z.nativeEnum(TimeOfDay)
-        }).safeParse(body);
+        }).safeParse({ ...body, time: body.time.toLowerCase() });
 
         if (!parsedBody.success) {
             return NextResponse.json({ error: "Invalid body" }, { status: 400 });
