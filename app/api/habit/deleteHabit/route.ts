@@ -35,9 +35,18 @@ export async function DELETE(req: NextRequest) {
         const todayStr = getLocalTodayStr(tz);
         const parsedDate = dayjs.utc(todayStr).toDate();
 
-        await prisma.habitLog.deleteMany({
-            where: { habitId: id, userId: user.id, logDate: parsedDate }
-        });
+        try {
+            await prisma.habitLog.delete({
+                where: {
+                    uq_habit_log_date: {
+                        habitId: id,
+                        logDate: parsedDate
+                    }
+                }
+            });
+        } catch (err) {
+            return NextResponse.json({ success: false, err });
+        }
 
         await recalculateDailySummary(user.id, todayStr);
 
