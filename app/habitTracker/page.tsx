@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 
 import Script from 'next/script';
 import './habitflow.css';
+import { toast } from 'sonner';
 
 const w = (fn: string, ...args: unknown[]) => () => (window as any)[fn]?.(...args);
 const wE = (fn: string) => (e: React.ChangeEvent<HTMLSelectElement>) => (window as any)[fn]?.(e.target.value);
@@ -15,15 +16,27 @@ export default function HabitFlowPage() {
   const [dbData, setDbData] = useState(null);
 
   useEffect(() => {
+    (window as any).showToast = (msg: string) => {
+      toast.error(msg);
+    };
+
     fetch('/api/habit/init')
-      .then(res => res.json())
+      .then(async (res) => {
+        const data = await res.json()
+        if (!res.ok) {
+          throw new Error(data.error || "Request failed")
+        }
+        return data
+      })
       .then(data => {
         if (data.success && data.state) {
-          setDbData(data.state);
+          setDbData(data.state)
         }
       })
-      .catch(err => console.error("Failed to fetch initial habit state", err));
-  }, []);
+      .catch(err => {
+        toast.error("Failed to fetch initial habit state")
+      })
+  }, [])
 
   if (!dbData) {
     return (

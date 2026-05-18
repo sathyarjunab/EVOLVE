@@ -60,6 +60,14 @@ function getInjectedState() {
 
 let state = getInjectedState();
 
+const showToast = (message) => {
+  if (typeof window !== 'undefined' && window.showToast) {
+    window.showToast(message);
+  } else {
+    console.error(message);
+  }
+};
+
 const save = async (url, body, method) => {
   try {
     const res = await fetch(`/api/${url}`, {
@@ -69,15 +77,26 @@ const save = async (url, body, method) => {
       },
       body: JSON.stringify(body)
     });
-    
+
     if (res.ok) {
       const data = await res.json();
       if (data.success && data.state) {
         state = data.state;
       }
+    } else {
+      let errMsg = "";
+      try {
+        const data = await res.json();
+        errMsg = data.error || data.message || "";
+      } catch (jsonErr) {
+        // failed to parse json
+      }
+      throw new Error(errMsg);
     }
   } catch (e) {
-    console.log(e)
+    console.log(e);
+    const msg = (e && e.message && e.message.trim()) ? e.message : "Something went wrong";
+    showToast(msg);
   }
 };
 
@@ -687,7 +706,7 @@ async function toggleHabit(id, done) {
     row.style.opacity = '0.5';
     row.style.pointerEvents = 'none';
   }
-  
+
   // 'done' from parameter is current status, so send !done to toggle
   await save('habit/toggleHabit', { id, done: !done }, 'PATCH')
   renderHabits();
@@ -700,9 +719,9 @@ async function toggleHabit(id, done) {
 async function reorderHabit(fromId, toId) {
   const list = document.getElementById('habitsList');
   if (list) list.style.opacity = '0.5';
-  
+
   await save('habit/reorderHabit', { fromId, toId }, 'PATCH');
-  
+
   if (list) list.style.opacity = '1';
   renderHabits();
 }
@@ -753,7 +772,7 @@ async function submitModal() {
   if (!name) { document.getElementById('mName').focus(); document.getElementById('mName').style.borderColor = 'var(--red)'; return; }
   document.getElementById('mName').style.borderColor = '';
   const time = document.getElementById('mTime').value;
-  
+
   const saveBtn = document.querySelector('.m-btn.save');
   const originalHtml = saveBtn.innerHTML;
   saveBtn.innerHTML = '<span class="loader" style="width: 14px; height: 14px; border: 2px solid #111; border-bottom-color: transparent; border-radius: 50%; display: inline-block; animation: rotation 1s linear infinite;"></span> Saving...';
@@ -764,10 +783,10 @@ async function submitModal() {
   } else {
     await save('habit/createHabit', { name, icon: selEmoji, time }, 'POST');
   }
-  
+
   saveBtn.innerHTML = originalHtml;
   saveBtn.disabled = false;
-  
+
   closeModal();
   renderHabits();
   updateStats();
@@ -777,19 +796,19 @@ function confirmDelete() { document.getElementById('mOverlay').classList.remove(
 function closeConfirm() { document.getElementById('cOverlay').classList.remove('open'); }
 async function doDelete() {
   if (!editId) return;
-  
+
   const delBtn = document.querySelector('#cOverlay .m-btn.del');
   const originalHtml = delBtn.innerHTML;
   delBtn.innerHTML = 'Deleting...';
   delBtn.disabled = true;
-  
-  await save('habit/deleteHabit', { id: editId }, 'DELETE'); 
-  
+
+  await save('habit/deleteHabit', { id: editId }, 'DELETE');
+
   delBtn.innerHTML = originalHtml;
   delBtn.disabled = false;
-  
-  closeConfirm(); 
-  renderHabits(); 
+
+  closeConfirm();
+  renderHabits();
   updateStats();
 }
 /* ══════════════════════════════════════════════
