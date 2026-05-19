@@ -75,18 +75,6 @@ export default function HabitFlowPage() {
             <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><rect x="1" y="1" width="4.5" height="4.5" rx="1.2" fill="currentColor" opacity=".7" /><rect x="7.5" y="1" width="4.5" height="4.5" rx="1.2" fill="currentColor" opacity=".4" /><rect x="1" y="7.5" width="4.5" height="4.5" rx="1.2" fill="currentColor" opacity=".4" /><rect x="7.5" y="7.5" width="4.5" height="4.5" rx="1.2" fill="currentColor" /></svg>
             Dashboard
           </button>
-          <button className="ntab" onClick={(e) => (window as any).setNav?.(e.currentTarget)}>
-            <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><rect x="1" y="7" width="2.5" height="5" rx="1" fill="currentColor" opacity=".4" /><rect x="5" y="4" width="2.5" height="8" rx="1" fill="currentColor" opacity=".6" /><rect x="9" y="1" width="2.5" height="11" rx="1" fill="currentColor" /></svg>
-            Analytics <span className="badge">0</span>
-          </button>
-          <button className="ntab" onClick={(e) => (window as any).setNav?.(e.currentTarget)}>
-            <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><circle cx="6.5" cy="6.5" r="5" stroke="currentColor" strokeWidth="1.3" opacity=".5" /><path d="M6.5 3.5v3.5l2 1.5" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" /></svg>
-            History
-          </button>
-          <button className="ntab" onClick={(e) => (window as any).setNav?.(e.currentTarget)}>
-            <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><circle cx="6.5" cy="4.5" r="2" stroke="currentColor" strokeWidth="1.3" /><path d="M1.5 11c0-2.2 2.2-4 5-4s5 1.8 5 4" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" /></svg>
-            Settings
-          </button>
         </div>
 
         {/* Year/Month dropdowns */}
