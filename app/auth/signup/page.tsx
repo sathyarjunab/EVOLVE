@@ -30,7 +30,7 @@ export default function SignupPage() {
       const res = await signup(data.name, data.email, data.password, timezone)
       if (res?.success) {
         toast.success(res.message)
-        window.location.href = "/evolve_v7.html?email=" + encodeURIComponent(data.email)
+        window.location.href = "/landing?email=" + encodeURIComponent(data.email)
       } else {
         toast.error(res?.message)
       }

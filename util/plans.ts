@@ -1,6 +1,6 @@
 const plans = [
     {
-        title: "HabitTracker",
+        title: "CombinedTracker",
         checkoutUrl:
             "https://evolve-10165.myshopify.com/cart/45636289888358:1",
     },

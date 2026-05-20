@@ -1,44 +1,55 @@
-import { NextRequest, NextResponse } from 'next/server';
-import getProfile from './app/serverAction/getUser';
+import { NextRequest, NextResponse } from "next/server";
+import getProfile from "./app/serverAction/getUser";
 
 export type Access = {
   habit_tracker: boolean;
   budget_tracker: boolean;
-}
+};
 
-// This function can be marked `async` if using `await` inside
 export async function proxy(request: NextRequest) {
-  const res = await getProfile()
-  let user = null
+  const res = await getProfile();
+
+  let user = null;
+
   if (res.success) {
-    user = res.data
-  }
-  if (!user && request.nextUrl.pathname.startsWith('/auth')) {
-    return NextResponse.next()
-  }
-  if (!user) {
-    return NextResponse.redirect(new URL('/auth/signup', request.url))
+    user = res.data;
   }
 
-  const access = user.access as Access
+  const pathname = request.nextUrl.pathname;
+
+  // Allow auth pages for unauthenticated users
+  if (!user && pathname.startsWith("/auth")) {
+    return NextResponse.next();
+  }
+
+  // Redirect unauthenticated users
+  if (!user) {
+    return NextResponse.redirect(new URL("/auth/signup", request.url));
+  }
+
+  const access = user.access as Access;
+  // Decide target route
+  let target = "/landing";
 
   if (access.habit_tracker && access.budget_tracker) {
-    return NextResponse.redirect(new URL('/combined-tracker', request.url))
+    target = "/combined-tracker";
+  } else if (access.habit_tracker) {
+    target = "/habit-tracker";
+  } else if (access.budget_tracker) {
+    target = "/budget-tracker";
   }
 
-  if (access.habit_tracker) {
-    return NextResponse.redirect(new URL('/habit-tracker', request.url))
+  // Prevent infinite redirect loop
+  if (pathname !== target) {
+    if (target === "/landing") {
+      target += "?email=" + user.email;
+    }
+    return NextResponse.redirect(new URL(target, request.url));
   }
 
-  if (access.budget_tracker) {
-    return NextResponse.redirect(new URL('/budget-tracker', request.url))
-  }
-
-  return NextResponse.redirect(new URL("/landing?email=" + encodeURIComponent(user.email), request.url))
+  return NextResponse.next();
 }
 
 export const config = {
-  matcher: [
-    '/((?!api|_next/static|_next/image|favicon.ico).*)',
-  ],
-}
+  matcher: ["/((?!api|_next/static|_next/image|favicon.ico|.*\\..*).*)"],
+};

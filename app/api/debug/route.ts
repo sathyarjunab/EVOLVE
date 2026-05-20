@@ -1,18 +1,18 @@
-import pool from "../../db/connection";
+import { prisma } from "@/prisma/prisma";
 import { NextResponse } from "next/server";
 
 export async function GET() {
   try {
-    const result = await pool.query("SELECT NOW()");
+    const result = await prisma.$queryRaw`SELECT NOW()`;
 
     return NextResponse.json({
       success: true,
-      data: result.rows,
+      data: result,
     });
-  } catch (error) {
+  } catch (error: any) {
     return NextResponse.json({
       success: false,
-      error,
+      error: error.message || error,
     });
   }
 }
