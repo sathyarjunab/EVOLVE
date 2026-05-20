@@ -24,13 +24,13 @@ export default function SignupPage() {
   const router = useRouter()
 
 
-    async function onSubmit(data: SignupSchema) {
+  async function onSubmit(data: SignupSchema) {
     try {
       const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
       const res = await signup(data.name, data.email, data.password, timezone)
       if (res?.success) {
         toast.success(res.message)
-        router.push("/")
+        window.location.href = "/evolve_v7.html?email=" + encodeURIComponent(data.email)
       } else {
         toast.error(res?.message)
       }

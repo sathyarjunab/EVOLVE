@@ -32,7 +32,7 @@ export default function LoginPage() {
         toast.error(res.message)
       } else {
         toast.success("Welcome back!")
-        router.push("/")
+        window.location.href = "/evolve_v7.html?email=" + encodeURIComponent(data.email)
       }
     } catch (err) {
       toast.error("Something went wrong")
