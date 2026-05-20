@@ -53,6 +53,7 @@ model User {
   habitLogs     HabitLog[]
   dailySummaries DailySummary[]
   trackerStats  TrackerStats[]
+  transactions Transaction[]
 
   @@map("users")
 }
@@ -162,4 +163,43 @@ model TrackerStats {
 
   @@id([userId, trackerType])
   @@map("tracker_stats")
+}
+
+model Transaction {
+  id                String   @id @default(cuid())
+
+  // USER
+  userId            String
+  user              User     @relation(fields: [userId], references: [id])
+
+  // SHOPIFY
+  shopifyOrderId    String   @unique
+  shopifyOrderName  String?
+  shopifyPaymentId  String?
+
+  // PRODUCT
+  planName          String
+  variantId         BigInt
+
+  // PAYMENT
+  amount            Decimal  @db.Decimal(10, 2)
+  currency          String
+
+  // STATUS
+  paymentStatus     String
+  fulfillmentStatus String?
+
+  // CUSTOMER
+  customerEmail     String
+
+  // RAW WEBHOOK DATA
+  rawPayload        Json?
+
+  // TIMESTAMPS
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  @@index([userId])
+  @@index([shopifyOrderId])
+  @@index([customerEmail])
 }
