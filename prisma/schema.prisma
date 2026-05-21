@@ -203,3 +203,18 @@ model Transaction {
   @@index([shopifyOrderId])
   @@index([customerEmail])
 }
+
+model ShopifyWebhookLog {
+  id          String   @id @default(cuid())
+
+  success     Boolean  @default(false)
+
+  error       String?
+
+  payload     Json
+
+  createdAt   DateTime @default(now())
+  
+  @@index([createdAt(sort: Desc)])
+  @@map("shopify_webhook_logs")
+}

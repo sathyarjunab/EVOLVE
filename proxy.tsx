@@ -34,16 +34,13 @@ export async function proxy(request: NextRequest) {
   if (access.habit_tracker && access.budget_tracker) {
     target = "/combined-tracker";
   } else if (access.habit_tracker) {
-    target = "/habit-tracker";
+    target = "/habitTracker";
   } else if (access.budget_tracker) {
     target = "/budget-tracker";
   }
 
   // Prevent infinite redirect loop
   if (pathname !== target) {
-    if (target === "/landing") {
-      target += "?email=" + user.email;
-    }
     return NextResponse.redirect(new URL(target, request.url));
   }
 
