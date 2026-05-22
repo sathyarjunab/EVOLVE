@@ -1022,8 +1022,7 @@ function onboardNameInput() {
 // }
 function checkOnboarding() {
   if (!state.userName) {
-    document.getElementById('onboardOverlay').classList.add('open');
-    setTimeout(() => document.getElementById('onboardName').focus(), 80);
+    setWelcomeName('Friend');
   } else {
     setWelcomeName(state.userName);
   }
@@ -1037,53 +1036,6 @@ initNavDropdowns();
 checkOnboarding();
 renderHabits();
 updateStats();
-
-function _bootCharts() {
-  activePeriod = 'monthly';
-  document.querySelectorAll('.tgl[data-period]').forEach(t =>
-    t.classList.toggle('active', t.dataset.period === 'monthly')
-  );
-  initBarChart();
-  initLineChart();
-  const yr = parseInt(document.getElementById('navYear').value);
-  const mo = parseInt(document.getElementById('navMonth').value);
-  buildHeatmapForPeriod(yr, mo);
-  window.addEventListener('resize', () => {
-    if (barChart) {
-      const w = document.getElementById('chartWrap');
-      const c = document.getElementById('barChart');
-      if (w.offsetWidth > 0 && w.offsetHeight > 0) {
-        c.width = w.offsetWidth; c.height = w.offsetHeight;
-        barChart.resize(); setTimeout(() => showBarTip(selBar), 150);
-      }
-    }
-    if (lineChart) {
-      const w = document.querySelector('.line-wrap');
-      const c = document.getElementById('lineChart');
-      if (w.offsetWidth > 0 && w.offsetHeight > 0) {
-        c.width = w.offsetWidth; c.height = w.offsetHeight;
-        lineChart.resize();
-      }
-    }
-  });
-}
-
-// Handle both cases: Chart.js already loaded or still loading
-if (typeof Chart !== 'undefined') {
-  _bootCharts();
-} else {
-  let _attempts = 0;
-  const _chartPoll = setInterval(() => {
-    _attempts++;
-    if (typeof Chart !== 'undefined') {
-      clearInterval(_chartPoll);
-      _bootCharts();
-    } else if (_attempts > 200) {
-      clearInterval(_chartPoll);
-      console.warn('HabitFlow: Chart.js failed to load');
-    }
-  }, 50);
-}
 
 function bootCharts() {
   activePeriod = 'monthly';

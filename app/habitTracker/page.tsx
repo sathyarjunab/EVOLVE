@@ -480,7 +480,7 @@ export default function HabitFlowPage() {
         {/* Top Row */}
         <div className="top-row">
           <div className="welcome">
-            <div className="welcome-sub">Good morning,</div>
+            <div className="welcome-sub">Welcome back,</div>
             <div className="welcome-name" id="wName">
               Friend
             </div>
@@ -945,7 +945,6 @@ export default function HabitFlowPage() {
             <label className="m-label">Time of day</label>
             <select className="m-select" id="mTime">
               <option value="Morning">🌅 Morning</option>
-              <option value="Afternoon">☀️ Afternoon</option>
               <option value="Evening">🌙 Evening</option>
               <option value="Anytime">⚡ Anytime</option>
             </select>
