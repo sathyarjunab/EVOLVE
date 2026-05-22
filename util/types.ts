@@ -39,4 +39,7 @@ export interface ShopifyOrdersPaidWebhook {
     name: string;
     value: string;
   }[];
+  customer: {
+    id: number;
+  };
 }
