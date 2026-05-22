@@ -10,7 +10,7 @@ import { UserModel } from "../generated/prisma/models";
 
 function LandingContent() {
   //context
-  const { logout } = useAuth();
+  const { logout, user } = useAuth();
 
   //
   const router = useRouter();
@@ -70,9 +70,19 @@ function LandingContent() {
               />
             </svg>
           </button>
-          <a className="nav-cta" href="#trackers">
-            Get Started $15
-          </a>
+          {user ? (
+            <button
+              className="nav-cta"
+              onClick={() => logout()}
+              style={{ cursor: "pointer" }}
+            >
+              Logout
+            </button>
+          ) : (
+            <a className="nav-cta" href="#trackers">
+              Get Started $15
+            </a>
+          )}
         </nav>
 
         <section id="hero">

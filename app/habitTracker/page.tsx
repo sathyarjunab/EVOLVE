@@ -5,6 +5,8 @@ import { useEffect, useState } from "react";
 import Script from "next/script";
 import "./habitflow.css";
 import { toast } from "sonner";
+import { LogOut } from "lucide-react";
+import { useAuth } from "../AuthContextProvider";
 
 const w =
   (fn: string, ...args: unknown[]) =>
@@ -30,6 +32,7 @@ const MONTHS = [
 ];
 
 export default function HabitFlowPage() {
+  const { logout } = useAuth();
   const [dbData, setDbData] = useState(null);
 
   useEffect(() => {
@@ -296,6 +299,19 @@ export default function HabitFlowPage() {
             </svg>
           </a>
           <button
+            className="nav-feedback-btn"
+            onClick={() => logout()}
+            style={{
+              cursor: "pointer",
+              display: "flex",
+              alignItems: "center",
+              gap: "6px",
+            }}
+          >
+            <LogOut size={12} strokeWidth={2} />
+            <span>Logout</span>
+          </button>
+          <button
             id="navHamburger"
             className="nav-hamburger"
             onClick={() => (window as any).toggleDrawer?.()}
@@ -444,6 +460,16 @@ export default function HabitFlowPage() {
                 />
               </svg>
               Add Habit
+            </button>
+            <button
+              className="drawer-link"
+              onClick={() => {
+                logout();
+                (window as any).closeDrawer?.();
+              }}
+            >
+              <LogOut size={13} strokeWidth={1.4} />
+              Logout
             </button>
           </div>
         </div>
