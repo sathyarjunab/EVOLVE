@@ -13,7 +13,8 @@
       "Bash(npx prisma *)",
       "Bash(dir /s /b \"C:\\\\evolve\\\\evolve\\\\app\\\\api\\\\budget\")",
       "Bash(dir /b \"C:\\\\evolve\\\\evolve\\\\util\")",
-      "Bash(dir /b \"C:\\\\evolve\\\\evolve\\\\public\\\\budgetflow-init.js\")"
+      "Bash(dir /b \"C:\\\\evolve\\\\evolve\\\\public\\\\budgetflow-init.js\")",
+      "Bash(npx tsc *)"
     ]
   }
 }

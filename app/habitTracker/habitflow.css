@@ -1,4 +1,5 @@
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+/* Reset inside @layer base so it never overrides Tailwind @layer utilities */
+@layer base{*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}}
 :root{
   --bg:#1B1B1F; --s1:#232327; --s2:#2A2A2F; --s3:#323238;
   --border:#38383F; --lime:#C8FF4D; --lime-dim:#A8D935;
@@ -6,8 +7,10 @@
   --grn:#4ADE80; --red:#F87171;
 }
 html,body{height:100%;background:var(--bg)}
-body{font-family:'Manrope',sans-serif;color:var(--t1);display:flex;flex-direction:column;overflow:hidden}
-@media(max-width:768px){html,body{height:auto;min-height:100%}body{overflow:auto}
+/* overflow:hidden removed from body — .content handles its own scroll;
+   keeping it on body would prevent auth pages from scrolling */
+body{font-family:'Manrope',sans-serif;color:var(--t1);display:flex;flex-direction:column}
+@media(max-width:768px){html,body{height:auto;min-height:100%}
 .content{overflow:visible;padding-bottom:40px}}
 
 /* ── NAV ─────────────────────────────── */
