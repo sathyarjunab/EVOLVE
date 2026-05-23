@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import Script from "next/script";
 import "./habitflow.css";
 import { toast } from "sonner";
-import { LogOut } from "lucide-react";
+import { LogOut, Loader2 } from "lucide-react";
 import { useAuth } from "../AuthContextProvider";
 
 const w =
@@ -34,6 +34,12 @@ const MONTHS = [
 export default function HabitFlowPage() {
   const { logout } = useAuth();
   const [dbData, setDbData] = useState(null);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
+
+  async function handleLogout() {
+    setIsLoggingOut(true);
+    await logout();
+  }
 
   useEffect(() => {
     (window as any).showToast = (msg: string) => {
@@ -300,16 +306,22 @@ export default function HabitFlowPage() {
           </a>
           <button
             className="nav-feedback-btn"
-            onClick={() => logout()}
+            onClick={handleLogout}
+            disabled={isLoggingOut}
             style={{
-              cursor: "pointer",
+              cursor: isLoggingOut ? "not-allowed" : "pointer",
               display: "flex",
               alignItems: "center",
               gap: "6px",
+              opacity: isLoggingOut ? 0.6 : 1,
             }}
           >
-            <LogOut size={12} strokeWidth={2} />
-            <span>Logout</span>
+            {isLoggingOut ? (
+              <Loader2 size={12} strokeWidth={2} className="animate-spin" />
+            ) : (
+              <LogOut size={12} strokeWidth={2} />
+            )}
+            <span>{isLoggingOut ? "Logging out…" : "Logout"}</span>
           </button>
           <button
             id="navHamburger"
@@ -463,13 +475,18 @@ export default function HabitFlowPage() {
             </button>
             <button
               className="drawer-link"
+              disabled={isLoggingOut}
               onClick={() => {
-                logout();
                 (window as any).closeDrawer?.();
+                handleLogout();
               }}
             >
-              <LogOut size={13} strokeWidth={1.4} />
-              Logout
+              {isLoggingOut ? (
+                <Loader2 size={13} strokeWidth={1.4} className="animate-spin" />
+              ) : (
+                <LogOut size={13} strokeWidth={1.4} />
+              )}
+              {isLoggingOut ? "Logging out…" : "Logout"}
             </button>
           </div>
         </div>

@@ -53,6 +53,13 @@ body {
   background: var(--s1);
   border: 1px solid var(--border);
   border-radius: 18px;
+  padding: 2rem;
+}
+
+@media (min-width: 640px) {
+  .glass-panel {
+    padding: 2.5rem;
+  }
 }
 
 .input-field {

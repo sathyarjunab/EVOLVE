@@ -3,12 +3,18 @@
 import { useEffect, useState } from "react";
 import Script from "next/script";
 import "./budgetflow.css";
-import { LogOut } from "lucide-react";
+import { LogOut, Loader2 } from "lucide-react";
 import { useAuth } from "../AuthContextProvider";
 
 export default function BudgetFlowPage() {
   const { logout } = useAuth();
   const [dbData, setDbData] = useState<any>(null);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
+
+  async function handleLogout() {
+    setIsLoggingOut(true);
+    await logout();
+  }
 
   useEffect(() => {
     fetch("/api/budget/init")
@@ -306,16 +312,22 @@ export default function BudgetFlowPage() {
           {/* Logout button */}
           <button
             className="nav-feedback-btn"
-            onClick={() => logout()}
+            onClick={handleLogout}
+            disabled={isLoggingOut}
             style={{
-              cursor: "pointer",
+              cursor: isLoggingOut ? "not-allowed" : "pointer",
               display: "flex",
               alignItems: "center",
               gap: "6px",
+              opacity: isLoggingOut ? 0.6 : 1,
             }}
           >
-            <LogOut size={12} strokeWidth={2} />
-            <span>Logout</span>
+            {isLoggingOut ? (
+              <Loader2 size={12} strokeWidth={2} className="animate-spin" />
+            ) : (
+              <LogOut size={12} strokeWidth={2} />
+            )}
+            <span>{isLoggingOut ? "Logging out…" : "Logout"}</span>
           </button>
 
           <div className="avatar" title="Profile"></div>

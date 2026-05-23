@@ -2,6 +2,7 @@
 
 import Script from "next/script";
 import { Suspense, useEffect, useState } from "react";
+import { Loader2 } from "lucide-react";
 import { useAuth } from "../AuthContextProvider";
 import getProfile from "../serverAction/getUser";
 import "./landing.css";
@@ -16,6 +17,12 @@ function LandingContent() {
   const router = useRouter();
 
   const [profile, setProfile] = useState<UserModel | null>(null);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
+
+  async function handleLogout() {
+    setIsLoggingOut(true);
+    await logout();
+  }
 
   useEffect(() => {
     const loadProfile = async () => {
@@ -73,10 +80,20 @@ function LandingContent() {
           {user ? (
             <button
               className="nav-cta"
-              onClick={() => logout()}
-              style={{ cursor: "pointer" }}
+              onClick={handleLogout}
+              disabled={isLoggingOut}
+              style={{
+                cursor: isLoggingOut ? "not-allowed" : "pointer",
+                opacity: isLoggingOut ? 0.6 : 1,
+                display: "inline-flex",
+                alignItems: "center",
+                gap: "6px",
+              }}
             >
-              Logout
+              {isLoggingOut && (
+                <Loader2 size={13} strokeWidth={2} className="animate-spin" />
+              )}
+              {isLoggingOut ? "Logging out…" : "Logout"}
             </button>
           ) : (
             <a className="nav-cta" href="#trackers">

@@ -16,7 +16,9 @@ export default function RootLayout({
       className={`h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
-        <Toaster />
+        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, zIndex: 9999, pointerEvents: 'none' }}>
+          <Toaster />
+        </div>
         <AuthProvider>
           {children}
         </AuthProvider>
