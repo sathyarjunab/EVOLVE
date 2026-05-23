@@ -49,11 +49,16 @@ model User {
   updatedAt  DateTime @updatedAt @map("updated_at")
 
   // Relations
-  habits        Habit[]
-  habitLogs     HabitLog[]
-  dailySummaries DailySummary[]
-  trackerStats  TrackerStats[]
-  transactions Transaction[]
+  habits             Habit[]
+  habitLogs          HabitLog[]
+  dailySummaries     DailySummary[]
+  trackerStats       TrackerStats[]
+  transactions       Transaction[]
+  budgetSettings     BudgetSettings?
+  incomeSources      IncomeSource[]
+  budgetTransactions BudgetTransaction[]
+  fixedDues          FixedDue[]
+  savingsGoals       SavingsGoal[]
 
   @@map("users")
 }
@@ -163,6 +168,128 @@ model TrackerStats {
 
   @@id([userId, trackerType])
   @@map("tracker_stats")
+}
+
+// ═══════════════════════════════════════════════════════════════
+// BUDGET TRACKER
+// ═══════════════════════════════════════════════════════════════
+
+enum BudgetTransactionType {
+  income
+  expense
+  savings
+}
+
+// One row per user. Currency preference, bank balance snapshot,
+// tutorial seen flag.
+model BudgetSettings {
+  userId         String    @id @map("user_id")
+  currency       String    @default("$") @db.VarChar(5)
+  tutorialSeen   Boolean   @default(false) @map("tutorial_seen")
+  bankBalance    Decimal?  @db.Decimal(12, 2) @map("bank_balance")
+  bankNote       String    @default("") @db.VarChar(200) @map("bank_note")
+  bankBalUpdated DateTime? @map("bank_bal_updated")
+  updatedAt      DateTime  @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("budget_settings")
+}
+
+// Recurring income lines. One-off income goes into BudgetTransaction
+// as type=income instead.
+model IncomeSource {
+  id        String   @id @default(uuid())
+  userId    String   @map("user_id")
+  name      String   @db.VarChar(80)
+  amount    Decimal  @db.Decimal(12, 2)
+  emoji     String   @db.VarChar(8)
+  type      String   @default("monthly") @db.VarChar(30) // monthly, weekly, bi-weekly…
+  isActive  Boolean  @default(true) @map("is_active")
+  sortOrder Int      @default(0) @map("sort_order") @db.SmallInt
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, isActive], name: "idx_income_sources_user_active")
+  @@map("income_sources")
+}
+
+// Every money movement: expense, one-off income, or savings allocation.
+// Savings transactions carry a goalId FK.
+model BudgetTransaction {
+  id        String                @id @default(uuid())
+  userId    String                @map("user_id")
+  type      BudgetTransactionType
+  name      String                @db.VarChar(120)
+  amount    Decimal               @db.Decimal(12, 2)
+  category  String                @db.VarChar(60)
+  date      DateTime              @db.Date
+  note      String?               @db.VarChar(300)
+  goalId    String?               @map("goal_id")
+  createdAt DateTime              @default(now()) @map("created_at")
+  updatedAt DateTime              @updatedAt @map("updated_at")
+
+  user User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  goal SavingsGoal? @relation(fields: [goalId], references: [id], onDelete: SetNull)
+
+  @@index([userId, date(sort: Desc)], name: "idx_budget_txs_user_date")
+  @@index([userId, type],             name: "idx_budget_txs_user_type")
+  @@map("budget_transactions")
+}
+
+// Recurring bills / EMIs. dueDay = day-of-month (1–31).
+// Paid-months tracked in DuePaidLog, not a JSON array.
+model FixedDue {
+  id        String   @id @default(uuid())
+  userId    String   @map("user_id")
+  name      String   @db.VarChar(80)
+  amount    Decimal  @db.Decimal(12, 2)
+  dueDay    Int      @map("due_day") @db.SmallInt
+  category  String   @db.VarChar(60)
+  emoji     String   @db.VarChar(8)
+  isActive  Boolean  @default(true) @map("is_active")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  user     User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  paidLogs DuePaidLog[]
+
+  @@index([userId, isActive], name: "idx_fixed_dues_user_active")
+  @@map("fixed_dues")
+}
+
+// PK (dueId, periodKey) — one row = one bill marked paid in one month.
+// periodKey format: "YYYY-MM"
+model DuePaidLog {
+  dueId     String @map("due_id")
+  periodKey String @map("period_key") @db.VarChar(7)
+
+  due FixedDue @relation(fields: [dueId], references: [id], onDelete: Cascade)
+
+  @@id([dueId, periodKey])
+  @@map("due_paid_logs")
+}
+
+// Savings targets. currentAmount is kept in sync on every
+// savings transaction write (same pattern as TrackerStats).
+model SavingsGoal {
+  id            String   @id @default(uuid())
+  userId        String   @map("user_id")
+  name          String   @db.VarChar(80)
+  targetAmount  Decimal  @db.Decimal(12, 2) @map("target_amount")
+  currentAmount Decimal  @default(0) @db.Decimal(12, 2) @map("current_amount")
+  emoji         String   @db.VarChar(8)
+  isActive      Boolean  @default(true) @map("is_active")
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
+
+  user         User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  transactions BudgetTransaction[]
+
+  @@index([userId, isActive], name: "idx_savings_goals_user_active")
+  @@map("savings_goals")
 }
 
 model Transaction {

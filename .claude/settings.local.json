@@ -2,7 +2,18 @@
   "permissions": {
     "allow": [
       "Bash(Get-ChildItem -Path \"C:\\\\evolve\\\\evolve\" -Directory)",
-      "Bash(Select-Object Name)"
+      "Bash(Select-Object Name)",
+      "Bash(node -e ' *)",
+      "Bash(Get-Content \"C:\\\\evolve\\\\evolve\\\\app\\\\budget-tracker\\\\page.tsx\")",
+      "Bash(Measure-Object -Line)",
+      "PowerShell(\\(Get-Content \"C:\\\\evolve\\\\evolve\\\\app\\\\budget-tracker\\\\page.tsx\"\\).Count; \\(Get-Content \"C:\\\\evolve\\\\evolve\\\\public\\\\budgetflow-init.js\"\\).Count; \\(Get-Content \"C:\\\\evolve\\\\evolve\\\\app\\\\budget-tracker\\\\budgetflow.css\"\\).Count)",
+      "PowerShell(Move-Item \"C:\\\\evolve\\\\evolve\\\\app\\\\budgetTracker\" \"C:\\\\evolve\\\\evolve\\\\app\\\\budget-tracker\")",
+      "Bash(dir \"C:\\\\evolve\\\\evolve\\\\app\\\\api\" /b)",
+      "Bash(dir \"C:\\\\evolve\\\\evolve\\\\util\" /b)",
+      "Bash(npx prisma *)",
+      "Bash(dir /s /b \"C:\\\\evolve\\\\evolve\\\\app\\\\api\\\\budget\")",
+      "Bash(dir /b \"C:\\\\evolve\\\\evolve\\\\util\")",
+      "Bash(dir /b \"C:\\\\evolve\\\\evolve\\\\public\\\\budgetflow-init.js\")"
     ]
   }
 }
