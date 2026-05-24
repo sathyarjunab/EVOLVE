@@ -35,7 +35,7 @@ export default function SignupPage() {
   async function checkLogin() {
     const res = await getProfile();
     if (res.success) {
-      router.push("/login");
+      router.push("/landing");
     }
   }
 
@@ -62,7 +62,7 @@ export default function SignupPage() {
       <div className="absolute bottom-[-15%] left-[-10%] w-[50%] h-[50%] rounded-full bg-lime opacity-10 blur-[120px] pointer-events-none"></div>
 
       <div className="glass-panel w-full max-w-md relative z-10 mx-4 shadow-2xl transition-transform duration-500 ease-out hover:scale-[1.01]">
-        <div className="flex justify-center" style={{ marginBottom: '1.5rem' }}>
+        <div className="flex justify-center" style={{ marginBottom: "1.5rem" }}>
           <div className="w-14 h-14 bg-[#0D0D10] text-purple rounded-2xl flex items-center justify-center p-3 shadow-inner border border-s2">
             <svg width="24" height="24" viewBox="0 0 14 14" fill="none">
               <circle
@@ -83,16 +83,28 @@ export default function SignupPage() {
           </div>
         </div>
 
-        <h1 className="font-outfit text-3xl font-extrabold text-t1 tracking-tighter text-center" style={{ marginBottom: '0.5rem' }}>
+        <h1
+          className="font-outfit text-3xl font-extrabold text-t1 tracking-tighter text-center"
+          style={{ marginBottom: "0.5rem" }}
+        >
           Create Account
         </h1>
-        <p className="text-t2 text-sm text-center" style={{ marginBottom: '2rem' }}>
+        <p
+          className="text-t2 text-sm text-center"
+          style={{ marginBottom: "2rem" }}
+        >
           Join HabitFlow and upgrade your daily routine.
         </p>
 
-        <form style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }} onSubmit={handleSubmit(onSubmit)}>
+        <form
+          style={{ display: "flex", flexDirection: "column", gap: "1rem" }}
+          onSubmit={handleSubmit(onSubmit)}
+        >
           <div>
-            <label className="block text-[0.7rem] font-bold text-t2 uppercase tracking-wider" style={{ marginBottom: '0.375rem' }}>
+            <label
+              className="block text-[0.7rem] font-bold text-t2 uppercase tracking-wider"
+              style={{ marginBottom: "0.375rem" }}
+            >
               Full Name
             </label>
             <input
@@ -103,13 +115,19 @@ export default function SignupPage() {
               {...register("name")}
             />
             {errors.name && (
-              <p className="text-[0.7rem] text-red-500" style={{ marginTop: '0.25rem' }}>
+              <p
+                className="text-[0.7rem] text-red-500"
+                style={{ marginTop: "0.25rem" }}
+              >
                 {errors.name?.message}
               </p>
             )}
           </div>
           <div>
-            <label className="block text-[0.7rem] font-bold text-t2 uppercase tracking-wider" style={{ marginBottom: '0.375rem' }}>
+            <label
+              className="block text-[0.7rem] font-bold text-t2 uppercase tracking-wider"
+              style={{ marginBottom: "0.375rem" }}
+            >
               Email Address
             </label>
             <input
@@ -120,13 +138,19 @@ export default function SignupPage() {
               {...register("email")}
             />
             {errors.email && (
-              <p className="text-[0.7rem] text-red-500" style={{ marginTop: '0.25rem' }}>
+              <p
+                className="text-[0.7rem] text-red-500"
+                style={{ marginTop: "0.25rem" }}
+              >
                 {errors.email?.message}
               </p>
             )}
           </div>
           <div>
-            <label className="block text-[0.7rem] font-bold text-t2 uppercase tracking-wider" style={{ marginBottom: '0.375rem' }}>
+            <label
+              className="block text-[0.7rem] font-bold text-t2 uppercase tracking-wider"
+              style={{ marginBottom: "0.375rem" }}
+            >
               Password
             </label>
             <div className="relative">
@@ -146,7 +170,10 @@ export default function SignupPage() {
               </button>
             </div>
             {errors.password && (
-              <p className="text-[0.7rem] text-red-500" style={{ marginTop: '0.25rem' }}>
+              <p
+                className="text-[0.7rem] text-red-500"
+                style={{ marginTop: "0.25rem" }}
+              >
                 {errors.password?.message}
               </p>
             )}
@@ -156,7 +183,7 @@ export default function SignupPage() {
             type="submit"
             disabled={isSubmitting}
             className="auth-btn-primary w-full h-[46px] text-[0.95rem] tracking-wide shadow-[0_4px_24px_rgba(200,255,77,0.15)] hover:shadow-[0_6px_30px_rgba(200,255,77,0.3)] hover:-translate-y-0.5 active:translate-y-0 transition-all flex justify-center items-center gap-2 group disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:translate-y-0 disabled:hover:shadow-[0_4px_24px_rgba(200,255,77,0.15)]"
-            style={{ marginTop: '1.5rem' }}
+            style={{ marginTop: "1.5rem" }}
           >
             {isSubmitting ? (
               <>
@@ -186,7 +213,10 @@ export default function SignupPage() {
           </button>
         </form>
 
-        <p className="text-center text-[0.85rem] text-t2 font-medium" style={{ marginTop: '2rem' }}>
+        <p
+          className="text-center text-[0.85rem] text-t2 font-medium"
+          style={{ marginTop: "2rem" }}
+        >
           Already have an account?{" "}
           <Link
             href="/auth/login"

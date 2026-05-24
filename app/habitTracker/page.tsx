@@ -7,6 +7,7 @@ import "./habitflow.css";
 import { toast } from "sonner";
 import { LogOut, Loader2 } from "lucide-react";
 import { useAuth } from "../AuthContextProvider";
+import { useRouter } from "next/navigation";
 
 const w =
   (fn: string, ...args: unknown[]) =>
@@ -32,9 +33,16 @@ const MONTHS = [
 ];
 
 export default function HabitFlowPage() {
-  const { logout } = useAuth();
+  const { logout, user, loading } = useAuth();
+  const router = useRouter();
   const [dbData, setDbData] = useState(null);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
+
+  useEffect(() => {
+    if (!loading && !user) {
+      router.push("/auth/login");
+    }
+  }, [loading, user]);
 
   async function handleLogout() {
     setIsLoggingOut(true);

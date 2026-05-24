@@ -15,7 +15,9 @@
       "Bash(dir /b \"C:\\\\evolve\\\\evolve\\\\util\")",
       "Bash(dir /b \"C:\\\\evolve\\\\evolve\\\\public\\\\budgetflow-init.js\")",
       "Bash(npx tsc *)",
-      "Bash(ls /mnt/c/evolve/evolve/ --ignore=node_modules)"
+      "Bash(ls /mnt/c/evolve/evolve/ --ignore=node_modules)",
+      "Bash(Get-ChildItem C:\\\\evolve\\\\evolve -Filter \"*.ts\" -Depth 0)",
+      "Bash(Get-ChildItem C:\\\\evolve\\\\evolve -Filter \"*.tsx\" -Depth 0)"
     ]
   }
 }

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import getProfile from "./app/serverAction/getUser";
+import { toast } from "sonner";
 
 export type Access = {
   habit_tracker: boolean;
@@ -24,7 +25,7 @@ export async function proxy(request: NextRequest) {
 
   // Redirect unauthenticated users
   if (!user) {
-    return NextResponse.redirect(new URL("/auth/signup", request.url));
+    return NextResponse.redirect(new URL(`/landing`, request.url));
   }
 
   const access = user.access as Access;
@@ -48,5 +49,7 @@ export async function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/((?!api|_next/static|_next/image|favicon.ico|redirector|.*\\..*).*)"],
+  matcher: [
+    "/((?!api|_next/static|_next/image|favicon.ico|landing|redirector|.*\\..*).*)",
+  ],
 };

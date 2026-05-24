@@ -5,11 +5,19 @@ import Script from "next/script";
 import "./budgetflow.css";
 import { LogOut, Loader2 } from "lucide-react";
 import { useAuth } from "../AuthContextProvider";
+import { useRouter } from "next/navigation";
 
 export default function BudgetFlowPage() {
-  const { logout } = useAuth();
+  const { logout, user, loading } = useAuth();
+  const router = useRouter();
   const [dbData, setDbData] = useState<any>(null);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
+
+  useEffect(() => {
+    if (!loading && !user) {
+      router.push("/auth/login");
+    }
+  }, [loading, user]);
 
   async function handleLogout() {
     setIsLoggingOut(true);

@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Terms & Privacy — EVOLVE</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Manrope:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
+<style>
+:root {
+  --bg:     #1B1B1F;
+  --s1:     #232327;
+  --s2:     #2A2A2F;
+  --s3:     #323238;
+  --border: #38383F;
+  --lime:   #C8FF4D;
+  --lime-dim:#A8D935;
+  --purple: #7B6EF5;
+  --t1:     #FFFFFF;
+  --t2:     #9898A5;
+  --t3:     #55555F;
+  --grn:    #4ADE80;
+  --red:    #F87171;
+  --borderY: rgba(200,255,77,0.18);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{background:var(--bg);color:var(--t1);font-family:'Manrope',sans-serif;overflow-x:hidden;line-height:1.6;}
+::-webkit-scrollbar{width:4px;}
+::-webkit-scrollbar-track{background:var(--bg);}
+::-webkit-scrollbar-thumb{background:var(--s3);border-radius:9px;}
+
+/* ── NAV ── */
+nav{
+  position:fixed;top:0;left:0;right:0;z-index:100;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 6%;height:60px;
+  background:rgba(27,27,31,0.96);backdrop-filter:blur(16px);
+  border-bottom:1px solid var(--border);
+}
+.nav-logo{display:flex;align-items:center;text-decoration:none;gap:10px;}
+.nav-logo-text{font-family:'Outfit',sans-serif;font-size:1.3rem;font-weight:900;color:var(--lime);letter-spacing:-.02em;}
+.nav-back{
+  font-family:'Manrope',sans-serif;font-size:.8rem;font-weight:600;
+  color:var(--t2);text-decoration:none;padding:6px 14px;border-radius:20px;
+  border:1px solid var(--border);transition:color .18s,background .18s,border-color .18s;
+  display:flex;align-items:center;gap:6px;
+}
+.nav-back:hover{color:var(--t1);background:var(--s3);border-color:var(--purple);}
+
+/* ── PAGE HEADER ── */
+.page-header{
+  padding:120px 6% 60px;
+  background:radial-gradient(ellipse 70% 50% at 50% 0%,rgba(200,255,77,0.05) 0%,transparent 70%),var(--bg);
+  text-align:center;border-bottom:1px solid var(--border);
+}
+.page-eyebrow{
+  font-family:'Manrope',sans-serif;font-size:.68rem;font-weight:700;
+  letter-spacing:.28em;text-transform:uppercase;color:var(--lime);
+  background:rgba(200,255,77,0.08);border:1px solid rgba(200,255,77,0.15);
+  padding:5px 16px;border-radius:20px;display:inline-block;margin-bottom:20px;
+}
+.page-title{
+  font-family:'Outfit',sans-serif;font-size:clamp(38px,6vw,72px);
+  line-height:.95;font-weight:900;letter-spacing:-.03em;color:var(--t1);
+  margin-bottom:16px;
+}
+.page-title span{color:var(--lime);}
+.page-sub{font-size:14px;color:var(--t3);max-width:480px;margin:0 auto;}
+.page-sub strong{color:var(--t2);}
+
+/* ── TAB NAV ── */
+.tab-bar{
+  display:flex;justify-content:center;gap:8px;
+  padding:28px 6% 0;background:var(--bg);
+  border-bottom:1px solid var(--border);
+  position:sticky;top:60px;z-index:50;
+  background:rgba(27,27,31,0.97);backdrop-filter:blur(12px);
+}
+.tab-btn{
+  font-family:'Manrope',sans-serif;font-size:.82rem;font-weight:700;
+  color:var(--t2);padding:10px 24px;border-radius:10px 10px 0 0;
+  border:1px solid transparent;border-bottom:none;
+  cursor:pointer;background:transparent;
+  transition:color .18s,background .18s,border-color .18s;
+  position:relative;bottom:-1px;
+}
+.tab-btn.active{
+  color:var(--lime);
+  background:var(--s1);
+  border-color:var(--border);
+  border-bottom-color:var(--s1);
+}
+.tab-btn:not(.active):hover{color:var(--t1);background:var(--s2);}
+
+/* ── CONTENT ── */
+.content-wrap{max-width:780px;margin:0 auto;padding:60px 6% 100px;}
+
+.tab-panel{display:none;}
+.tab-panel.active{display:block;}
+
+/* Last updated badge */
+.last-updated{
+  display:inline-flex;align-items:center;gap:7px;
+  background:var(--s1);border:1px solid var(--border);
+  border-radius:20px;padding:5px 14px;
+  font-size:.7rem;font-weight:700;color:var(--t3);
+  letter-spacing:.08em;text-transform:uppercase;margin-bottom:40px;
+}
+.last-updated-dot{width:6px;height:6px;border-radius:50%;background:var(--grn);}
+
+/* Section styling */
+.doc-section{margin-bottom:44px;}
+.doc-section-label{
+  font-family:'Manrope',sans-serif;font-size:.62rem;font-weight:800;
+  letter-spacing:.22em;text-transform:uppercase;color:var(--lime);
+  margin-bottom:10px;display:block;
+}
+.doc-section h2{
+  font-family:'Outfit',sans-serif;font-size:1.35rem;font-weight:800;
+  color:var(--t1);letter-spacing:-.02em;margin-bottom:14px;line-height:1.2;
+}
+.doc-section p{
+  font-size:.875rem;color:var(--t2);line-height:1.75;margin-bottom:12px;
+}
+.doc-section p:last-child{margin-bottom:0;}
+.doc-section strong{color:var(--t1);font-weight:700;}
+
+/* Highlight box */
+.doc-highlight{
+  background:rgba(200,255,77,0.05);
+  border:1px solid var(--borderY);
+  border-radius:12px;padding:18px 20px;
+  margin:16px 0;
+}
+.doc-highlight p{color:var(--t2);font-size:.85rem;line-height:1.7;margin:0;}
+.doc-highlight strong{color:var(--lime);}
+
+/* Warning box */
+.doc-warning{
+  background:rgba(248,113,113,0.06);
+  border:1px solid rgba(248,113,113,0.2);
+  border-radius:12px;padding:18px 20px;
+  margin:16px 0;
+}
+.doc-warning p{color:#fca5a5;font-size:.85rem;line-height:1.7;margin:0;}
+.doc-warning strong{color:var(--red);}
+
+/* Divider */
+.doc-divider{height:1px;background:var(--border);margin:40px 0;}
+
+/* List */
+.doc-list{list-style:none;display:flex;flex-direction:column;gap:8px;margin:12px 0 16px;}
+.doc-list li{
+  display:flex;align-items:flex-start;gap:10px;
+  font-size:.85rem;color:var(--t2);line-height:1.65;
+}
+.doc-list li::before{
+  content:'';width:6px;height:6px;border-radius:50%;
+  background:var(--lime);flex-shrink:0;margin-top:7px;
+}
+
+/* Step card (for refund process) */
+.doc-steps{display:flex;flex-direction:column;gap:10px;margin:16px 0;}
+.doc-step{
+  display:flex;align-items:flex-start;gap:14px;
+  background:var(--s1);border:1px solid var(--border);
+  border-radius:12px;padding:16px 18px;
+  transition:border-color .2s;
+}
+.doc-step:hover{border-color:rgba(200,255,77,0.25);}
+.doc-step-num{
+  width:28px;height:28px;border-radius:50%;background:var(--lime);
+  color:#111117;font-family:'Outfit',sans-serif;font-weight:900;
+  font-size:.78rem;display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;
+}
+.doc-step-body{}
+.doc-step-title{font-family:'Outfit',sans-serif;font-size:.88rem;font-weight:700;color:var(--t1);margin-bottom:3px;}
+.doc-step-text{font-size:.8rem;color:var(--t2);line-height:1.6;}
+
+/* Contact block */
+.doc-contact{
+  background:var(--s1);border:1px solid var(--border);border-radius:14px;
+  padding:22px 24px;display:flex;align-items:center;justify-content:space-between;
+  flex-wrap:wrap;gap:14px;margin-top:16px;
+}
+.doc-contact-label{font-size:.75rem;color:var(--t3);font-weight:600;text-transform:uppercase;letter-spacing:.08em;margin-bottom:3px;}
+.doc-contact-email{font-family:'Outfit',sans-serif;font-size:1rem;font-weight:700;color:var(--lime);}
+.doc-contact-btn{
+  background:var(--purple);color:#fff;font-family:'Manrope',sans-serif;
+  font-size:.75rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;
+  padding:9px 18px;border-radius:9px;text-decoration:none;
+  transition:background .18s,transform .15s;white-space:nowrap;
+}
+.doc-contact-btn:hover{background:#6a5ee0;transform:translateY(-1px);}
+
+/* ── FOOTER ── */
+footer{
+  background:var(--s1);border-top:1px solid var(--border);
+  padding:24px 6%;display:flex;align-items:center;
+  justify-content:space-between;flex-wrap:wrap;gap:16px;
+}
+.footer-links{display:flex;gap:6px;flex-wrap:wrap;}
+.footer-links a{
+  font-size:.75rem;color:var(--t2);text-decoration:none;font-weight:600;
+  padding:5px 12px;border-radius:20px;transition:color .18s,background .18s;
+}
+.footer-links a:hover{color:var(--t1);background:var(--s2);}
+.footer-copy{font-size:.72rem;color:var(--t3);}
+
+@media(max-width:600px){
+  .tab-btn{padding:8px 14px;font-size:.75rem;}
+  .content-wrap{padding:40px 5% 80px;}
+  .doc-contact{flex-direction:column;align-items:flex-start;}
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a class="nav-logo" href="/landing">
+    <span class="nav-logo-text">EVOLVE</span>
+  </a>
+  <a class="nav-back" href="/landing">
+    <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M9 2L4 7l5 5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    Back to Home
+  </a>
+</nav>
+
+<!-- PAGE HEADER -->
+<div class="page-header">
+  <p class="page-eyebrow">Legal</p>
+  <h1 class="page-title">Terms &amp; <span>Privacy</span></h1>
+  <p class="page-sub">Last updated: <strong>May 2026.</strong> Please read these carefully before purchasing or using Evolve products.</p>
+</div>
+
+<!-- TAB BAR -->
+<div class="tab-bar">
+  <button class="tab-btn active" onclick="switchTab('terms', this)">Terms of Service</button>
+  <button class="tab-btn" onclick="switchTab('privacy', this)">Privacy Policy</button>
+</div>
+
+<!-- CONTENT -->
+<div class="content-wrap">
+
+  <!-- ═══ TERMS OF SERVICE ═══ -->
+  <div class="tab-panel active" id="panel-terms">
+
+    <div class="last-updated">
+      <div class="last-updated-dot"></div>
+      Effective: May 2026
+    </div>
+
+    <!-- 1. Agreement -->
+    <div class="doc-section">
+      <span class="doc-section-label">Section 01</span>
+      <h2>Agreement to Terms</h2>
+      <p>By purchasing, accessing, or using any Evolve product (including the Budget Tracker 2026, Habit Tracker 2026, or the Complete Bundle), you agree to be bound by these Terms of Service. If you do not agree, do not complete your purchase or use the product.</p>
+      <p>These Terms apply to all users worldwide, including customers in the United States, European Union, Australia, the Middle East, and India. Where local consumer law grants you additional rights that cannot be excluded, these Terms do not limit those rights.</p>
+    </div>
+
+    <div class="doc-divider"></div>
+
+    <!-- 2. Products -->
+    <div class="doc-section">
+      <span class="doc-section-label">Section 02</span>
+      <h2>Products &amp; Access</h2>
+      <p>Evolve sells digital web application products. Upon successful payment, you will receive access to your purchased tracker(s) via a personal web dashboard account. Access is granted to the individual purchaser only and is non-transferable.</p>
+      <ul class="doc-list">
+        <li>All purchases are <strong>one-time payments</strong> — there are no recurring charges or subscriptions.</li>
+        <li>Access is tied to your account. You are responsible for keeping your login credentials secure.</li>
+        <li>Evolve reserves the right to modify, update, or improve the product at any time without prior notice. Updates that improve functionality will be provided at no additional charge.</li>
+        <li>We do not guarantee perpetual availability of the product but will make reasonable efforts to maintain access.</li>
+      </ul>
+    </div>
+
+    <div class="doc-divider"></div>
+
+    <!-- 3. Pricing -->
+    <div class="doc-section">
+      <span class="doc-section-label">Section 03</span>
+      <h2>Pricing &amp; Payment</h2>
+      <p>All prices are listed in USD. You are responsible for any applicable taxes, currency conversion fees, or charges imposed by your bank or payment provider.</p>
+      <div class="doc-highlight">
+        <p><strong>Current pricing:</strong> Budget Tracker — $15 &nbsp;|&nbsp; Habit Tracker — $15 &nbsp;|&nbsp; Complete Bundle — $25. Prices are subject to change; the price at the time of your purchase is the price you pay.</p>
+      </div>
+      <p>Payment is processed by third-party payment providers. Evolve does not store your card details. By completing a purchase, you authorise the charge to your nominated payment method.</p>
+    </div>
+
+    <div class="doc-divider"></div>
+
+    <!-- 4. Refund Policy -->
+    <div class="doc-section">
+      <span class="doc-section-label">Section 04</span>
+      <h2>Refund Policy</h2>
+      <p>Because our products are digital goods delivered immediately upon purchase, <strong>all sales are final</strong> — with one clearly defined exception.</p>
+
+      <div class="doc-warning">
+        <p><strong>No refunds</strong> will be issued for change of mind, accidental purchase, incompatibility with your device or browser beyond our control, or failure to use the product.</p>
+      </div>
+
+      <p><strong>The one exception — Bug-Related Refund:</strong> If the tracker you purchased contains a material bug that substantially prevents you from using its core functionality, you may be eligible for a refund, subject to the following process:</p>
+
+      <div class="doc-steps">
+        <div class="doc-step">
+          <div class="doc-step-num">1</div>
+          <div class="doc-step-body">
+            <div class="doc-step-title">Report within 7 days</div>
+            <div class="doc-step-text">Contact us at <strong>scalenevolve@gmail.com</strong> within 7 calendar days of your purchase date. Describe the bug clearly, including steps to reproduce it and any screenshots or screen recordings.</div>
+          </div>
+        </div>
+        <div class="doc-step">
+          <div class="doc-step-num">2</div>
+          <div class="doc-step-body">
+            <div class="doc-step-title">We investigate &amp; attempt a fix</div>
+            <div class="doc-step-text">Once we receive and verify your report, we will work to fix the bug within <strong>48–72 hours</strong>. We will keep you informed of progress via email.</div>
+          </div>
+        </div>
+        <div class="doc-step">
+          <div class="doc-step-num">3</div>
+          <div class="doc-step-body">
+            <div class="doc-step-title">Refund if we cannot fix it</div>
+            <div class="doc-step-text">If we are unable to resolve the bug within the 48–72 hour window and the issue remains unresolved, we will issue a full refund to your original payment method. Refunds typically appear within 5–10 business days depending on your bank.</div>
+          </div>
+        </div>
+      </div>
+
+      <p>Refund requests submitted after 7 days, or for issues that do not constitute a material bug (e.g. cosmetic preferences, minor display variations across browsers, or features not advertised), will not be eligible.</p>
+    </div>
+
+    <div class="doc-divider"></div>
+
+    <!-- 5. Intellectual Property -->
+    <div class="doc-section">
+      <span class="doc-section-label">Section 05</span>
+      <h2>Intellectual Property</h2>
+      <p>All Evolve products — including the application code, design, branding, and content — are the intellectual property of Evolve. Your purchase grants you a <strong>limited, non-exclusive, non-transferable licence</strong> to use the product for your personal or internal business purposes.</p>
+      <ul class="doc-list">
+        <li>You may not resell, redistribute, sublicense, copy, or reverse-engineer any Evolve product.</li>
+        <li>You may not use Evolve branding, trademarks, or product screenshots for commercial purposes without written permission.</li>
+        <li>Sharing account access with others is not permitted under a single-user licence.</li>
+      </ul>
+    </div>
+
+    <div class="doc-divider"></div>
+
+    <!-- 6. Limitation of Liability -->
+    <div class="doc-section">
+      <span class="doc-section-label">Section 06</span>
+      <h2>Limitation of Liability</h2>
+      <p>To the maximum extent permitted by applicable law, Evolve and its team members shall not be liable for any:</p>
+      <ul class="doc-list">
+        <li>Loss of data, revenue, profits, or business opportunities arising from use of, or inability to use, our products.</li>
+        <li>Indirect, incidental, special, consequential, or punitive damages of any kind.</li>
+        <li>Failures, interruptions, or delays in service caused by third-party providers (hosting, payment processors, internet infrastructure).</li>
+        <li>Errors in financial figures, calculations, or data you enter into the tracker — you remain responsible for verifying your own financial information.</li>
+        <li>Loss or corruption of your account data due to circumstances beyond our reasonable control.</li>
+      </ul>
+      <div class="doc-highlight">
+        <p>Our total liability to you in connection with any claim arising from these Terms or your use of our products shall not exceed the amount you paid for the product in question.</p>
+      </div>
+      <p>Nothing in these Terms excludes liability for fraud, death or personal injury caused by negligence, or any other liability that cannot be excluded under applicable law.</p>
+    </div>
+
+    <div class="doc-divider"></div>
+
+    <!-- 7. Governing Law -->
+    <div class="doc-section">
+      <span class="doc-section-label">Section 07</span>
+      <h2>Governing Law &amp; Disputes</h2>
+      <p>These Terms shall be governed by and construed in accordance with applicable law. We aim to resolve all disputes amicably — please contact us first before pursuing any formal claim.</p>
+      <p>Where you are a consumer located in the <strong>European Union</strong>, you may be entitled to additional protections under EU consumer law, including the right to refer disputes to your local consumer authority or the EU Online Dispute Resolution platform at <strong>ec.europa.eu/odr</strong>.</p>
+      <p>Where you are a consumer located in <strong>Australia</strong>, nothing in these Terms excludes your rights under the Australian Consumer Law, including guarantees that cannot be excluded by contract.</p>
+      <p>Where you are a consumer located in <strong>India</strong>, you may have rights under the Consumer Protection Act, 2019 and applicable IT regulations.</p>
+    </div>
+
+    <div class="doc-divider"></div>
+
+    <!-- 8. Changes -->
+    <div class="doc-section">
+      <span class="doc-section-label">Section 08</span>
+      <h2>Changes to These Terms</h2>
+      <p>We may update these Terms from time to time. Changes will be posted on this page with an updated effective date. Continued use of our products after changes are posted constitutes your acceptance of the revised Terms.</p>
+    </div>
+
+    <div class="doc-divider"></div>
+
+    <!-- Contact -->
+    <div class="doc-section">
+      <span class="doc-section-label">Contact</span>
+      <h2>Questions?</h2>
+      <p>If you have any questions about these Terms, want to initiate a refund claim, or need support, contact us at:</p>
+      <div class="doc-contact">
+        <div>
+          <div class="doc-contact-label">Support &amp; Legal</div>
+          <div class="doc-contact-email">scalenevolve@gmail.com</div>
+        </div>
+        <a class="doc-contact-btn" href="mailto:scalenevolve@gmail.com">Email Us</a>
+      </div>
+    </div>
+
+  </div><!-- /panel-terms -->
+
+
+  <!-- ═══ PRIVACY POLICY ═══ -->
+  <div class="tab-panel" id="panel-privacy">
+
+    <div class="last-updated">
+      <div class="last-updated-dot"></div>
+      Effective: May 2026
+    </div>
+
+    <!-- 1. Overview -->
+    <div class="doc-section">
+      <span class="doc-section-label">Section 01</span>
+      <h2>Overview</h2>
+      <p>Evolve ("we", "us", "our") is committed to protecting your personal information. This Privacy Policy explains what data we collect, why we collect it, how we use it, and your rights in relation to it.</p>
+      <p>This policy applies to all users of Evolve products and this website, regardless of your location — including users in the United States, European Union, Australia, the Middle East, and India.</p>
+    </div>
+
+    <div class="doc-divider"></div>
+
+    <!-- 2. Data We Collect -->
+    <div class="doc-section">
+      <span class="doc-section-label">Section 02</span>
+      <h2>Data We Collect</h2>
+      <p>We collect only the minimum information necessary to provide you with the product and support:</p>
+      <ul class="doc-list">
+        <li><strong>Account information:</strong> Your name and email address when you create an account or make a purchase.</li>
+        <li><strong>Payment information:</strong> Processed entirely by our third-party payment provider. We do not store your card number, CVV, or banking details.</li>
+        <li><strong>Usage data:</strong> Data you enter into the tracker (budget figures, habits, etc.) stored in your account to power the dashboard.</li>
+        <li><strong>Technical data:</strong> Browser type, device type, approximate location (country/region), and basic analytics to help us improve the product.</li>
+        <li><strong>Communications:</strong> Emails or messages you send to our support address.</li>
+      </ul>
+      <p>We do not collect sensitive personal data such as government IDs, biometric data, or health information.</p>
+    </div>
+
+    <div class="doc-divider"></div>
+
+    <!-- 3. How We Use Your Data -->
+    <div class="doc-section">
+      <span class="doc-section-label">Section 03</span>
+      <h2>How We Use Your Data</h2>
+      <ul class="doc-list">
+        <li>To create and manage your account and grant access to purchased products.</li>
+        <li>To process payments and send purchase confirmations.</li>
+        <li>To provide customer support and respond to bug reports or refund requests.</li>
+        <li>To send you important service updates (not marketing, unless you opt in).</li>
+        <li>To improve product functionality based on aggregated, anonymised usage data.</li>
+        <li>To comply with applicable legal obligations.</li>
+      </ul>
+      <div class="doc-highlight">
+        <p><strong>We do not sell your personal data</strong> to third parties. We do not use your data for targeted advertising.</p>
+      </div>
+    </div>
+
+    <div class="doc-divider"></div>
+
+    <!-- 4. Legal Bases (GDPR) -->
+    <div class="doc-section">
+      <span class="doc-section-label">Section 04</span>
+      <h2>Legal Bases for Processing (EU / UK Users)</h2>
+      <p>If you are located in the European Union or United Kingdom, we process your personal data on the following legal bases under GDPR:</p>
+      <ul class="doc-list">
+        <li><strong>Contract performance:</strong> Processing necessary to fulfil your purchase and provide product access.</li>
+        <li><strong>Legitimate interests:</strong> Improving our products, preventing fraud, and maintaining security.</li>
+        <li><strong>Legal obligation:</strong> Where processing is required by law.</li>
+        <li><strong>Consent:</strong> For optional communications such as product updates or newsletters, where you have opted in.</li>
+      </ul>
+    </div>
+
+    <div class="doc-divider"></div>
+
+    <!-- 5. Data Sharing -->
+    <div class="doc-section">
+      <span class="doc-section-label">Section 05</span>
+      <h2>Data Sharing &amp; Third Parties</h2>
+      <p>We share your data only where necessary:</p>
+      <ul class="doc-list">
+        <li><strong>Payment processors:</strong> To handle your transaction securely. They operate under their own privacy policies and are bound by payment industry standards (PCI-DSS).</li>
+        <li><strong>Hosting and infrastructure providers:</strong> Who store your account data on our behalf, under strict data processing agreements.</li>
+        <li><strong>Legal authorities:</strong> Where required by applicable law, court order, or to protect the rights and safety of Evolve or others.</li>
+      </ul>
+      <p>We do not share your data with advertisers, data brokers, or any third party for commercial purposes.</p>
+    </div>
+
+    <div class="doc-divider"></div>
+
+    <!-- 6. International Transfers -->
+    <div class="doc-section">
+      <span class="doc-section-label">Section 06</span>
+      <h2>International Data Transfers</h2>
+      <p>Evolve operates globally and your data may be processed in countries outside your own. Where data is transferred outside the European Economic Area, we ensure appropriate safeguards are in place — such as Standard Contractual Clauses — to protect your information in line with GDPR requirements.</p>
+    </div>
+
+    <div class="doc-divider"></div>
+
+    <!-- 7. Your Rights -->
+    <div class="doc-section">
+      <span class="doc-section-label">Section 07</span>
+      <h2>Your Rights</h2>
+      <p>Depending on where you are located, you may have the following rights regarding your personal data:</p>
+      <ul class="doc-list">
+        <li><strong>Access:</strong> Request a copy of the personal data we hold about you.</li>
+        <li><strong>Correction:</strong> Ask us to correct inaccurate or incomplete data.</li>
+        <li><strong>Deletion:</strong> Request that we delete your personal data ("right to be forgotten"), subject to legal obligations.</li>
+        <li><strong>Restriction:</strong> Ask us to restrict processing of your data in certain circumstances.</li>
+        <li><strong>Portability:</strong> Receive your data in a structured, machine-readable format (EU/UK users).</li>
+        <li><strong>Objection:</strong> Object to processing based on legitimate interests.</li>
+        <li><strong>Withdraw consent:</strong> Where processing is based on consent, you may withdraw it at any time.</li>
+      </ul>
+      <p>To exercise any of these rights, contact us at the email below. We will respond within 30 days. EU users may also lodge a complaint with their local data protection authority.</p>
+      <p><strong>Australian users:</strong> You may contact the Office of the Australian Information Commissioner (OAIC) if you have unresolved privacy concerns. <strong>Indian users:</strong> Your rights are governed by the Digital Personal Data Protection Act, 2023 and applicable IT regulations.</p>
+    </div>
+
+    <div class="doc-divider"></div>
+
+    <!-- 8. Data Retention -->
+    <div class="doc-section">
+      <span class="doc-section-label">Section 08</span>
+      <h2>Data Retention</h2>
+      <p>We retain your account and purchase data for as long as your account is active, or as needed to provide the product and comply with legal obligations (e.g. tax records). If you close your account, we will delete or anonymise your personal data within a reasonable period, except where retention is required by law.</p>
+    </div>
+
+    <div class="doc-divider"></div>
+
+    <!-- 9. Security -->
+    <div class="doc-section">
+      <span class="doc-section-label">Section 09</span>
+      <h2>Security</h2>
+      <p>We implement reasonable technical and organisational measures to protect your data against unauthorised access, loss, or disclosure. However, no system is perfectly secure — if you believe your account has been compromised, contact us immediately.</p>
+    </div>
+
+    <div class="doc-divider"></div>
+
+    <!-- 10. Cookies -->
+    <div class="doc-section">
+      <span class="doc-section-label">Section 10</span>
+      <h2>Cookies</h2>
+      <p>We use essential cookies to keep you logged in and maintain your session. We may also use anonymised analytics cookies to understand how users interact with our product. We do not use third-party advertising cookies.</p>
+      <p>You can control cookies through your browser settings. Disabling essential cookies may affect your ability to access your account.</p>
+    </div>
+
+    <div class="doc-divider"></div>
+
+    <!-- 11. Children -->
+    <div class="doc-section">
+      <span class="doc-section-label">Section 11</span>
+      <h2>Children's Privacy</h2>
+      <p>Our products are not directed at children under the age of 16 (or 13 in the United States). We do not knowingly collect personal data from minors. If you believe a child has provided us with personal data, please contact us and we will delete it promptly.</p>
+    </div>
+
+    <div class="doc-divider"></div>
+
+    <!-- 12. Changes -->
+    <div class="doc-section">
+      <span class="doc-section-label">Section 12</span>
+      <h2>Changes to This Policy</h2>
+      <p>We may update this Privacy Policy from time to time. Material changes will be communicated via email or a notice in your dashboard. Continued use of our products after changes are posted constitutes acceptance of the revised policy.</p>
+    </div>
+
+    <div class="doc-divider"></div>
+
+    <!-- Contact -->
+    <div class="doc-section">
+      <span class="doc-section-label">Contact</span>
+      <h2>Privacy Requests &amp; Questions</h2>
+      <p>For any privacy-related requests, data access queries, or to exercise your rights, contact us at:</p>
+      <div class="doc-contact">
+        <div>
+          <div class="doc-contact-label">Privacy &amp; Data</div>
+          <div class="doc-contact-email">scalenevolve@gmail.com</div>
+        </div>
+        <a class="doc-contact-btn" href="mailto:scalenevolve@gmail.com">Email Us</a>
+      </div>
+    </div>
+
+  </div><!-- /panel-privacy -->
+
+</div><!-- /content-wrap -->
+
+<footer>
+  <div class="footer-links">
+    <a href="evolve_terms.html" style="color:var(--lime);">Terms of Service</a>
+    <a href="evolve_terms.html#privacy" onclick="switchTabById('privacy')">Privacy Policy</a>
+    <a href="mailto:scalenevolve@gmail.com">Support</a>
+  </div>
+  <div class="footer-copy">© 2026 Evolve. All rights reserved.</div>
+</footer>
+
+<script>
+function switchTab(name, btn) {
+  // Hide all panels
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  // Show target
+  document.getElementById('panel-' + name).classList.add('active');
+  btn.classList.add('active');
+}
+
+function switchTabById(name) {
+  const btn = Array.from(document.querySelectorAll('.tab-btn')).find(b => b.getAttribute('onclick').includes("'" + name + "'"));
+  if (btn) switchTab(name, btn);
+}
+
+// Check URL hash on load
+window.addEventListener('DOMContentLoaded', () => {
+  if (window.location.hash === '#privacy') {
+    const btn = document.querySelectorAll('.tab-btn')[1];
+    switchTab('privacy', btn);
+  }
+});
+</script>
+</body>
+</html>
