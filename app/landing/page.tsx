@@ -949,23 +949,32 @@ function LandingContent() {
                 </div>
                 <div className="t-was">was $30</div>
               </div>
-              <a
-                className="t-btn"
-                href={
-                  profile
-                    ? "https://evolve-10165.myshopify.com/cart/45636288446566:1" +
-                      `?checkout[email]=${encodeURIComponent(profile.email ?? "")}` +
-                      `&attributes[userId]=${encodeURIComponent(profile.id)}` +
-                      `&checkout[return_url]=${encodeURIComponent(
-                        process.env.NEXT_PUBLIC_DOMAIN!,
-                      )}`
-                    : "/auth/login"
-                }
-                target="_self"
-                rel="noopener noreferrer"
-              >
-                Get Started at $15
-              </a>
+              {(() => {
+                const access = Array.isArray((profile as any)?.access) ? (profile as any).access as string[] : [];
+                const hasHabit = access.includes("habit_tracker");
+                const hasBoth = hasHabit && access.includes("money_tracker");
+                return hasHabit ? (
+                  <a className="t-btn" href={hasBoth ? "/combined-tracker" : "/habitTracker"} target="_self">
+                    {hasBoth ? "Open Combined Tracker" : "Open Habit Tracker"}
+                  </a>
+                ) : (
+                  <a
+                    className="t-btn"
+                    href={
+                      profile
+                        ? "https://evolve-10165.myshopify.com/cart/45636288446566:1" +
+                          `?checkout[email]=${encodeURIComponent(profile.email ?? "")}` +
+                          `&attributes[userId]=${encodeURIComponent(profile.id)}` +
+                          `&checkout[return_url]=${encodeURIComponent(process.env.NEXT_PUBLIC_DOMAIN!)}`
+                        : "/auth/login"
+                    }
+                    target="_self"
+                    rel="noopener noreferrer"
+                  >
+                    Get Started at $15
+                  </a>
+                );
+              })()}
             </div>
           </div>
 
@@ -2286,23 +2295,31 @@ function LandingContent() {
                 </div>
                 <div className="t-was">was $50</div>
               </div>
-              <a
-                className="t-btn t-btn-hero"
-                href={
-                  profile
-                    ? "https://evolve-10165.myshopify.com/cart/45636289888358:1" +
-                      `?checkout[email]=${encodeURIComponent(profile.email ?? "")}` +
-                      `&attributes[userId]=${encodeURIComponent(profile.id)}` +
-                      `&checkout[return_url]=${encodeURIComponent(
-                        process.env.NEXT_PUBLIC_DOMAIN!,
-                      )}`
-                    : "/auth/login"
-                }
-                target="_self"
-                rel="noopener noreferrer"
-              >
-                Get Bundled at $25
-              </a>
+              {(() => {
+                const access = Array.isArray((profile as any)?.access) ? (profile as any).access as string[] : [];
+                const hasBoth = access.includes("habit_tracker") && access.includes("money_tracker");
+                return hasBoth ? (
+                  <a className="t-btn t-btn-hero" href="/combined-tracker" target="_self">
+                    Open Combined Tracker
+                  </a>
+                ) : (
+                  <a
+                    className="t-btn t-btn-hero"
+                    href={
+                      profile
+                        ? "https://evolve-10165.myshopify.com/cart/45636289888358:1" +
+                          `?checkout[email]=${encodeURIComponent(profile.email ?? "")}` +
+                          `&attributes[userId]=${encodeURIComponent(profile.id)}` +
+                          `&checkout[return_url]=${encodeURIComponent(process.env.NEXT_PUBLIC_DOMAIN!)}`
+                        : "/auth/login"
+                    }
+                    target="_self"
+                    rel="noopener noreferrer"
+                  >
+                    Get Bundled at $25
+                  </a>
+                );
+              })()}
             </div>
           </div>
 
@@ -3283,23 +3300,32 @@ function LandingContent() {
                 </div>
                 <div className="t-was">was $30</div>
               </div>
-              <a
-                className="t-btn"
-                href={
-                  profile
-                    ? "https://evolve-10165.myshopify.com/cart/45636276551782:1" +
-                      `?checkout[email]=${encodeURIComponent(profile.email ?? "")}` +
-                      `&attributes[userId]=${encodeURIComponent(profile.id)}` +
-                      `&checkout[return_url]=${encodeURIComponent(
-                        process.env.NEXT_PUBLIC_DOMAIN!,
-                      )}`
-                    : "/auth/login"
-                }
-                target="_self"
-                rel="noopener noreferrer"
-              >
-                Get Started at $15
-              </a>
+              {(() => {
+                const access = Array.isArray((profile as any)?.access) ? (profile as any).access as string[] : [];
+                const hasMoney = access.includes("money_tracker");
+                const hasBoth = hasMoney && access.includes("habit_tracker");
+                return hasMoney ? (
+                  <a className="t-btn" href={hasBoth ? "/combined-tracker" : "/budget-tracker"} target="_self">
+                    {hasBoth ? "Open Combined Tracker" : "Open Budget Tracker"}
+                  </a>
+                ) : (
+                  <a
+                    className="t-btn"
+                    href={
+                      profile
+                        ? "https://evolve-10165.myshopify.com/cart/45636276551782:1" +
+                          `?checkout[email]=${encodeURIComponent(profile.email ?? "")}` +
+                          `&attributes[userId]=${encodeURIComponent(profile.id)}` +
+                          `&checkout[return_url]=${encodeURIComponent(process.env.NEXT_PUBLIC_DOMAIN!)}`
+                        : "/auth/login"
+                    }
+                    target="_self"
+                    rel="noopener noreferrer"
+                  >
+                    Get Started at $15
+                  </a>
+                );
+              })()}
             </div>
           </div>
         </div>

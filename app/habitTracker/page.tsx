@@ -39,8 +39,16 @@ export default function HabitFlowPage() {
   const [isLoggingOut, setIsLoggingOut] = useState(false);
 
   useEffect(() => {
-    if (!loading && !user) {
-      router.push("/auth/login");
+    if (!loading) {
+      if (!user) {
+        router.push("/auth/login");
+      } else {
+        // Users with both trackers go to the combined tracker
+        const access = Array.isArray((user as any).access) ? (user as any).access as string[] : [];
+        if (access.includes("habit_tracker") && access.includes("money_tracker")) {
+          router.push("/combined-tracker");
+        }
+      }
     }
   }, [loading, user]);
 
