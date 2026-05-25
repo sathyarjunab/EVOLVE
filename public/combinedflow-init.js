@@ -180,6 +180,8 @@ function refreshOverview(){
   if(el('ov-hrate'))el('ov-hrate').textContent=hPct+'%';
   if(el('ov-hrate-sub'))el('ov-hrate-sub').textContent=hDone+' of '+hTotal+' done';
   buildOverviewHabits();buildOverviewGoals();buildOvTrend();
+  buildDonut(yr,mo,'donutChart','donutCenterVal','donutLegend');
+  renderRecentTxs('recentList');
   setWelcomeName(hState.userName||bState.userName||'You');
 }
 
@@ -277,7 +279,7 @@ function refreshSavingsSection(){
 /* ══════════════════════════════════════════════
    DONUT CHART
 ══════════════════════════════════════════════ */
-let donutChart2Inst=null;
+const donutInsts={};
 function buildDonut(yr,mo,canvasId,centerValId,legendId){
   if(!yr){const p=getPeriod();yr=p.yr;mo=p.mo;}
   const txs=getMonthTxs(yr,mo).filter(t=>t.type==='expense');
@@ -287,10 +289,10 @@ function buildDonut(yr,mo,canvasId,centerValId,legendId){
   const colors=labels.map(l=>CAT_COLORS[l]||'#888');
   const total=data.reduce((a,b)=>a+b,0);
   const centerVal=document.getElementById(centerValId);if(centerVal)centerVal.textContent=fmtC(total);
-  if(donutChart2Inst){donutChart2Inst.destroy();donutChart2Inst=null;}
+  if(donutInsts[canvasId]){donutInsts[canvasId].destroy();donutInsts[canvasId]=null;}
   if(!labels.length){const legend=document.getElementById(legendId);if(legend)legend.innerHTML='<div style="font-size:.7rem;color:var(--t3);text-align:center;padding:10px 0">No expenses yet</div>';return;}
   const ctx=canvas.getContext('2d');
-  donutChart2Inst=new Chart(ctx,{type:'doughnut',data:{labels,datasets:[{data,backgroundColor:colors,borderWidth:0,hoverOffset:4}]},options:{responsive:true,maintainAspectRatio:true,cutout:'72%',plugins:{legend:{display:false},tooltip:{backgroundColor:'rgba(27,27,31,.95)',borderColor:'rgba(56,56,63,.8)',borderWidth:1,titleColor:'#9898A5',bodyColor:'#fff',padding:9,cornerRadius:9}}}});
+  donutInsts[canvasId]=new Chart(ctx,{type:'doughnut',data:{labels,datasets:[{data,backgroundColor:colors,borderWidth:0,hoverOffset:4}]},options:{responsive:true,maintainAspectRatio:true,cutout:'72%',plugins:{legend:{display:false},tooltip:{backgroundColor:'rgba(27,27,31,.95)',borderColor:'rgba(56,56,63,.8)',borderWidth:1,titleColor:'#9898A5',bodyColor:'#fff',padding:9,cornerRadius:9}}}});
   const legend=document.getElementById(legendId);
   if(legend)legend.innerHTML=labels.slice(0,5).map((l,i)=>`<div class="dl-item"><div class="dl-dot" style="background:${colors[i]}"></div><span class="dl-name">${l}</span><span class="dl-pct">${total>0?Math.round(data[i]/total*100):0}%</span></div>`).join('');
 }

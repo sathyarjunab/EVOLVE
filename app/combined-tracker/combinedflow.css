@@ -116,7 +116,7 @@ nav{height:60px;flex-shrink:0;background:rgba(35,35,39,.96);backdrop-filter:blur
 
 /* ── CHART PANEL (donut) ── */
 .chart-panel{flex:1;min-width:0;height:280px}
-#donutWrap{flex:1;min-height:0;position:relative;display:flex;align-items:center;justify-content:center}
+#donutWrap,#donutWrap2{flex:1;min-height:0;position:relative;display:flex;align-items:center;justify-content:center}
 .donut-center{position:absolute;text-align:center;pointer-events:none}
 .donut-center-val{font-family:'Outfit',sans-serif;font-size:1.2rem;font-weight:800;color:var(--t1);letter-spacing:-.03em;line-height:1}
 .donut-center-lbl{font-size:.58rem;color:var(--t2);margin-top:2px}
