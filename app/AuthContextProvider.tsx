@@ -45,7 +45,7 @@ export const AuthProvider = ({
   const logout = async () => {
     await logoutAction();
     setUser(null);
-    router.push("/auth/login");
+    router.push("/landing");
   };
 
   const authValue = useMemo(() => ({ user, loading, refreshProfile, logout }), [user, loading]);
