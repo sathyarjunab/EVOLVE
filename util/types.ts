@@ -4,8 +4,8 @@ export const plans = {
     checkoutUrl: "https://evolve-10165.myshopify.com/cart/45636289888358:1",
     variantId: 45636289888358,
   },
-  BudgerTracker: {
-    title: "BudgerTracker",
+  BudgetTracker: {
+    title: "BudgetTracker",
     checkoutUrl: "https://evolve-10165.myshopify.com/cart/45636288446566:1",
     variantId: 45636288446566,
   },

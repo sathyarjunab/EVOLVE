@@ -20,7 +20,7 @@ export default function CombinedTrackerPage() {
 
   useEffect(() => {
     if (!loading && !user) {
-      router.push("/auth/login");
+      router.push("/landing");
     }
   }, [loading, user]);
 

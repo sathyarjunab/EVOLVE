@@ -94,41 +94,6 @@ export async function POST(req: Request) {
       });
     }
 
-    // MAP PLAN
-    let activePlan: Access = {
-      habit_tracker: false,
-      budget_tracker: false,
-    };
-
-    let planName = "";
-
-    if (variantId === plans.HabitTracker.variantId) {
-      activePlan = {
-        habit_tracker: true,
-        budget_tracker: false,
-      };
-
-      planName = "HABIT_TRACKER";
-    }
-
-    if (variantId === plans.BudgerTracker.variantId) {
-      activePlan = {
-        habit_tracker: false,
-        budget_tracker: true,
-      };
-
-      planName = "BUDGET_TRACKER";
-    }
-
-    if (variantId === plans.CombinedTracker.variantId) {
-      activePlan = {
-        habit_tracker: true,
-        budget_tracker: true,
-      };
-
-      planName = "COMPLETE_BUNDLE";
-    }
-
     // FIND USER
     const user = await prisma.user.findUnique({
       where: {
@@ -145,6 +110,41 @@ export async function POST(req: Request) {
           status: 404,
         },
       );
+    }
+
+    // MAP PLAN
+    let activePlan: Access = {
+      habit_tracker: false,
+      budget_tracker: false,
+    };
+
+    let planName = "";
+
+    if (variantId === plans.HabitTracker.variantId) {
+      activePlan = {
+        ...(user.access as Access), // Preserve existing access
+        habit_tracker: true,
+      };
+
+      planName = "HABIT_TRACKER";
+    }
+
+    if (variantId === plans.BudgetTracker.variantId) {
+      activePlan = {
+        ...(user.access as Access), // Preserve existing access
+        budget_tracker: true,
+      };
+
+      planName = "BUDGET_TRACKER";
+    }
+
+    if (variantId === plans.CombinedTracker.variantId) {
+      activePlan = {
+        habit_tracker: true,
+        budget_tracker: true,
+      };
+
+      planName = "COMPLETE_BUNDLE";
     }
 
     // UPDATE USER ACCESS

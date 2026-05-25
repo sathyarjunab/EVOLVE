@@ -3,11 +3,11 @@
 import { useRouter } from "next/navigation";
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
 import { UserModel } from "./generated/prisma/models";
-import getProfile from "./serverAction/getUser";
+import getProfile, { passwordlessUser } from "./serverAction/getUser";
 import logoutAction from "./serverAction/logout";
 
 type AuthContextType = {
-  user: UserModel | null;
+  user: passwordlessUser | null;
   loading: boolean;
   refreshProfile: () => Promise<void>;
   logout: () => Promise<void>;
@@ -20,7 +20,7 @@ export const AuthProvider = ({
 }: Readonly<{ children: React.ReactNode }>) => {
   const router = useRouter();
 
-  const [user, setUser] = useState<UserModel | null>(null);
+  const [user, setUser] = useState<passwordlessUser | null>(null);
   const [loading, setLoading] = useState(true);
 
   const refreshProfile = async () => {
@@ -48,7 +48,10 @@ export const AuthProvider = ({
     router.push("/landing");
   };
 
-  const authValue = useMemo(() => ({ user, loading, refreshProfile, logout }), [user, loading]);
+  const authValue = useMemo(
+    () => ({ user, loading, refreshProfile, logout }),
+    [user, loading],
+  );
 
   return (
     <AuthContext.Provider value={authValue}>{children}</AuthContext.Provider>

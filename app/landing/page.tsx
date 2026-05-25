@@ -1,23 +1,59 @@
 "use client";
 
 import { Loader2 } from "lucide-react";
+import { useRouter } from "next/navigation";
 import Script from "next/script";
 import { Suspense, useEffect, useState } from "react";
+import { toast } from "sonner";
 import { useAuth } from "../AuthContextProvider";
-import { UserModel } from "../generated/prisma/models";
-import getProfile from "../serverAction/getUser";
+import getProfile, { passwordlessUser } from "../serverAction/getUser";
 import "./landing.css";
+import { Access } from "@/proxy";
+import type { CheckoutProduct } from "@/app/api/checkout/route";
 
 function LandingContent() {
   //context
-  const { logout, user } = useAuth();
+  const { logout, user, loading } = useAuth();
+  const router = useRouter();
 
-  const [profile, setProfile] = useState<UserModel | null>(null);
+  const [profile, setProfile] = useState<passwordlessUser | null>(null);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
+  const [buyLoading, setBuyLoading] = useState<CheckoutProduct | null>(null);
 
   async function handleLogout() {
     setIsLoggingOut(true);
     await logout();
+  }
+
+  async function handleBuy(product: CheckoutProduct) {
+    setBuyLoading(product);
+    try {
+      const res = await fetch("/api/checkout", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ product }),
+      });
+      const data = await res.json();
+
+      if (res.status === 401) {
+        router.push("/auth/login");
+        return;
+      }
+      if (res.status === 409) {
+        toast.error("You already have this subscription!");
+        router.push(data.redirect);
+        return;
+      }
+      if (!data.success || !data.url) {
+        toast.error("Something went wrong. Please try again.");
+        return;
+      }
+      window.location.href = data.url;
+    } catch {
+      toast.error("Something went wrong. Please try again.");
+    } finally {
+      setBuyLoading(null);
+    }
   }
 
   useEffect(() => {
@@ -950,29 +986,32 @@ function LandingContent() {
                 <div className="t-was">was $30</div>
               </div>
               {(() => {
-                const access = Array.isArray((profile as any)?.access) ? (profile as any).access as string[] : [];
-                const hasHabit = access.includes("habit_tracker");
-                const hasBoth = hasHabit && access.includes("money_tracker");
-                return hasHabit ? (
-                  <a className="t-btn" href={hasBoth ? "/combined-tracker" : "/habitTracker"} target="_self">
-                    {hasBoth ? "Open Combined Tracker" : "Open Habit Tracker"}
-                  </a>
-                ) : (
+                if (loading) return null;
+                const currentUser = user ?? profile;
+                const access = currentUser?.access as Access | undefined;
+                const hasBudget = access?.budget_tracker === true;
+                const hasHabit = access?.habit_tracker === true;
+                const hasBoth = hasBudget && hasHabit;
+                return hasBudget ? (
                   <a
                     className="t-btn"
-                    href={
-                      profile
-                        ? "https://evolve-10165.myshopify.com/cart/45636288446566:1" +
-                          `?checkout[email]=${encodeURIComponent(profile.email ?? "")}` +
-                          `&attributes[userId]=${encodeURIComponent(profile.id)}` +
-                          `&checkout[return_url]=${encodeURIComponent(process.env.NEXT_PUBLIC_DOMAIN!)}`
-                        : "/auth/login"
-                    }
+                    href={hasBoth ? "/combined-tracker" : "/budget-tracker"}
                     target="_self"
-                    rel="noopener noreferrer"
                   >
-                    Get Started at $15
+                    {hasBoth ? "Open Combined Tracker" : "Open Budget Tracker"}
                   </a>
+                ) : (
+                  <button
+                    className="t-btn"
+                    disabled={buyLoading !== null}
+                    onClick={() => handleBuy("budget_tracker")}
+                  >
+                    {buyLoading === "budget_tracker" ? (
+                      <Loader2 size={16} className="animate-spin" />
+                    ) : (
+                      "Get Started at $15"
+                    )}
+                  </button>
                 );
               })()}
             </div>
@@ -2296,28 +2335,30 @@ function LandingContent() {
                 <div className="t-was">was $50</div>
               </div>
               {(() => {
-                const access = Array.isArray((profile as any)?.access) ? (profile as any).access as string[] : [];
-                const hasBoth = access.includes("habit_tracker") && access.includes("money_tracker");
+                if (loading) return null;
+                const currentUser = user ?? profile;
+                const access = currentUser?.access as Access | undefined;
+                const hasBoth = access?.habit_tracker === true && access?.budget_tracker === true;
                 return hasBoth ? (
-                  <a className="t-btn t-btn-hero" href="/combined-tracker" target="_self">
+                  <a
+                    className="t-btn t-btn-hero"
+                    href="/combined-tracker"
+                    target="_self"
+                  >
                     Open Combined Tracker
                   </a>
                 ) : (
-                  <a
+                  <button
                     className="t-btn t-btn-hero"
-                    href={
-                      profile
-                        ? "https://evolve-10165.myshopify.com/cart/45636289888358:1" +
-                          `?checkout[email]=${encodeURIComponent(profile.email ?? "")}` +
-                          `&attributes[userId]=${encodeURIComponent(profile.id)}` +
-                          `&checkout[return_url]=${encodeURIComponent(process.env.NEXT_PUBLIC_DOMAIN!)}`
-                        : "/auth/login"
-                    }
-                    target="_self"
-                    rel="noopener noreferrer"
+                    disabled={buyLoading !== null}
+                    onClick={() => handleBuy("bundle")}
                   >
-                    Get Bundled at $25
-                  </a>
+                    {buyLoading === "bundle" ? (
+                      <Loader2 size={16} className="animate-spin" />
+                    ) : (
+                      "Get Bundled at $25"
+                    )}
+                  </button>
                 );
               })()}
             </div>
@@ -3301,29 +3342,32 @@ function LandingContent() {
                 <div className="t-was">was $30</div>
               </div>
               {(() => {
-                const access = Array.isArray((profile as any)?.access) ? (profile as any).access as string[] : [];
-                const hasMoney = access.includes("money_tracker");
-                const hasBoth = hasMoney && access.includes("habit_tracker");
-                return hasMoney ? (
-                  <a className="t-btn" href={hasBoth ? "/combined-tracker" : "/budget-tracker"} target="_self">
-                    {hasBoth ? "Open Combined Tracker" : "Open Budget Tracker"}
-                  </a>
-                ) : (
+                if (loading) return null;
+                const currentUser = user ?? profile;
+                const access = currentUser?.access as Access | undefined;
+                const hasHabit = access?.habit_tracker === true;
+                const hasBudget = access?.budget_tracker === true;
+                const hasBoth = hasHabit && hasBudget;
+                return hasHabit ? (
                   <a
                     className="t-btn"
-                    href={
-                      profile
-                        ? "https://evolve-10165.myshopify.com/cart/45636276551782:1" +
-                          `?checkout[email]=${encodeURIComponent(profile.email ?? "")}` +
-                          `&attributes[userId]=${encodeURIComponent(profile.id)}` +
-                          `&checkout[return_url]=${encodeURIComponent(process.env.NEXT_PUBLIC_DOMAIN!)}`
-                        : "/auth/login"
-                    }
+                    href={hasBoth ? "/combined-tracker" : "/habitTracker"}
                     target="_self"
-                    rel="noopener noreferrer"
                   >
-                    Get Started at $15
+                    {hasBoth ? "Open Combined Tracker" : "Open Habit Tracker"}
                   </a>
+                ) : (
+                  <button
+                    className="t-btn"
+                    disabled={buyLoading !== null}
+                    onClick={() => handleBuy("habit_tracker")}
+                  >
+                    {buyLoading === "habit_tracker" ? (
+                      <Loader2 size={16} className="animate-spin" />
+                    ) : (
+                      "Get Started at $15"
+                    )}
+                  </button>
                 );
               })()}
             </div>

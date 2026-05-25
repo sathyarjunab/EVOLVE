@@ -41,7 +41,7 @@ export default function HabitFlowPage() {
   useEffect(() => {
     if (!loading) {
       if (!user) {
-        router.push("/auth/login");
+        router.push("/landing");
       } else {
         // Users with both trackers go to the combined tracker
         const access = Array.isArray((user as any).access) ? (user as any).access as string[] : [];

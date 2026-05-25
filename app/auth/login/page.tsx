@@ -1,41 +1,45 @@
-"use client"
+"use client";
 
-import { LoginSchema, loginSchema } from '@/util/validator';
-import { zodResolver } from '@hookform/resolvers/zod';
-import Link from 'next/link';
-import { useForm } from 'react-hook-form';
-import { useState } from 'react';
-import { Eye, EyeOff, Loader2 } from 'lucide-react';
-import loginAction from '@/app/serverAction/loginAction';
-import { toast } from 'sonner';
-import { useRouter } from 'next/navigation';
+import { LoginSchema, loginSchema } from "@/util/validator";
+import { zodResolver } from "@hookform/resolvers/zod";
+import Link from "next/link";
+import { useForm } from "react-hook-form";
+import { useState } from "react";
+import { Eye, EyeOff, Loader2 } from "lucide-react";
+import loginAction from "@/app/serverAction/loginAction";
+import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 
 export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
 
-  const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm({
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+  } = useForm({
     resolver: zodResolver(loginSchema),
-    mode: 'onChange',
+    mode: "onChange",
     defaultValues: {
       email: "",
       password: "",
-    }
-  })
+    },
+  });
 
-  const router = useRouter()
+  const router = useRouter();
 
   async function onSubmit(data: LoginSchema) {
     try {
-      const res = await loginAction(data.email, data.password)
+      const res = await loginAction(data.email, data.password);
       // The server action returns undefined on success, or {success: false, message:...} on error
       if (res && res.success === false) {
-        toast.error(res.message)
+        toast.error(res.message);
       } else {
-        toast.success("Welcome back!")
-        window.location.href = "/landing?email=" + encodeURIComponent(data.email)
+        toast.success("Welcome back!");
+        window.location.href = "/redirector";
       }
     } catch (err) {
-      toast.error("Something went wrong")
+      toast.error("Something went wrong");
     }
   }
 
@@ -46,39 +50,76 @@ export default function LoginPage() {
       <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] rounded-full bg-lime opacity-10 blur-[100px] pointer-events-none"></div>
 
       <div className="glass-panel w-full max-w-md relative z-10 mx-4 shadow-2xl transition-transform duration-500 ease-out hover:scale-[1.01]">
-        <div className="flex justify-center" style={{ marginBottom: '2rem' }}>
+        <div className="flex justify-center" style={{ marginBottom: "2rem" }}>
           <div className="w-14 h-14 bg-[#0D0D10] text-lime rounded-2xl flex items-center justify-center p-3 shadow-inner border border-s2">
             <svg width="24" height="24" viewBox="0 0 14 14" fill="none">
-              <path d="M3 4h8M3 7h6M3 10h4" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" />
+              <path
+                d="M3 4h8M3 7h6M3 10h4"
+                stroke="currentColor"
+                strokeWidth="1.4"
+                strokeLinecap="round"
+              />
             </svg>
           </div>
         </div>
 
-        <h1 className="font-outfit text-3xl font-extrabold text-t1 tracking-tighter text-center" style={{ marginBottom: '0.5rem' }}>
+        <h1
+          className="font-outfit text-3xl font-extrabold text-t1 tracking-tighter text-center"
+          style={{ marginBottom: "0.5rem" }}
+        >
           Welcome back
         </h1>
-        <p className="text-t2 text-sm text-center" style={{ marginBottom: '2rem' }}>
+        <p
+          className="text-t2 text-sm text-center"
+          style={{ marginBottom: "2rem" }}
+        >
           Enter your details to access your dashboard.
         </p>
 
-        <form style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }} onSubmit={handleSubmit(onSubmit)}>
+        <form
+          style={{ display: "flex", flexDirection: "column", gap: "1.25rem" }}
+          onSubmit={handleSubmit(onSubmit)}
+        >
           <div>
-            <label className="block text-[0.7rem] font-bold text-t2 uppercase tracking-wider" style={{ marginBottom: '0.375rem' }}>Email Address</label>
+            <label
+              className="block text-[0.7rem] font-bold text-t2 uppercase tracking-wider"
+              style={{ marginBottom: "0.375rem" }}
+            >
+              Email Address
+            </label>
             <input
               type="email"
               className="input-field w-full h-[46px] px-4 placeholder:text-t3 focus:ring-2 focus:ring-purple/20 focus:border-purple outline-none transition-all"
               placeholder="name@example.com"
               required
-              {...register('email')}
+              {...register("email")}
             />
             {errors.email && (
-              <p className='text-[0.7rem] text-red-500' style={{ marginTop: '0.25rem' }}>{errors.email?.message}</p>
+              <p
+                className="text-[0.7rem] text-red-500"
+                style={{ marginTop: "0.25rem" }}
+              >
+                {errors.email?.message}
+              </p>
             )}
           </div>
           <div>
-            <div className="flex justify-between items-baseline" style={{ marginBottom: '0.375rem' }}>
-              <label className="block text-[0.7rem] font-bold text-t2 uppercase tracking-wider" style={{ marginBottom: '0.375rem' }}>Password</label>
-              <a href="#" className="text-xs text-purple hover:text-white transition-colors font-semibold">Forgot?</a>
+            <div
+              className="flex justify-between items-baseline"
+              style={{ marginBottom: "0.375rem" }}
+            >
+              <label
+                className="block text-[0.7rem] font-bold text-t2 uppercase tracking-wider"
+                style={{ marginBottom: "0.375rem" }}
+              >
+                Password
+              </label>
+              <a
+                href="#"
+                className="text-xs text-purple hover:text-white transition-colors font-semibold"
+              >
+                Forgot?
+              </a>
             </div>
             <div className="relative">
               <input
@@ -86,22 +127,23 @@ export default function LoginPage() {
                 className="input-field w-full h-[46px] px-4 pr-10 placeholder:text-t3 focus:ring-2 focus:ring-purple/20 focus:border-purple outline-none transition-all"
                 placeholder="••••••••"
                 required
-                {...register('password')}
+                {...register("password")}
               />
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
                 className="absolute inset-y-0 right-0 pr-3 flex items-center text-t2 hover:text-t1 transition-colors"
               >
-                {showPassword ? (
-                  <EyeOff size={18} />
-                ) : (
-                  <Eye size={18} />
-                )}
+                {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
               </button>
             </div>
             {errors.password && (
-              <p className='text-[0.7rem] text-red-500' style={{ marginTop: '0.25rem' }}>{errors.password?.message}</p>
+              <p
+                className="text-[0.7rem] text-red-500"
+                style={{ marginTop: "0.25rem" }}
+              >
+                {errors.password?.message}
+              </p>
             )}
           </div>
 
@@ -109,7 +151,7 @@ export default function LoginPage() {
             type="submit"
             disabled={isSubmitting}
             className="auth-btn-primary w-full h-[46px] text-[0.95rem] tracking-wide shadow-[0_4px_24px_rgba(200,255,77,0.15)] hover:shadow-[0_6px_30px_rgba(200,255,77,0.3)] hover:-translate-y-0.5 active:translate-y-0 transition-all flex justify-center items-center gap-2 group disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:translate-y-0 disabled:hover:shadow-[0_4px_24px_rgba(200,255,77,0.15)]"
-            style={{ marginTop: '1.5rem' }}
+            style={{ marginTop: "1.5rem" }}
           >
             {isSubmitting ? (
               <>
@@ -119,15 +161,35 @@ export default function LoginPage() {
             ) : (
               <>
                 Sign In
-                <svg width="12" height="12" viewBox="0 0 12 12" fill="none" className="transition-transform group-hover:translate-x-1"><path d="M2 6l3 3 5-5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg>
+                <svg
+                  width="12"
+                  height="12"
+                  viewBox="0 0 12 12"
+                  fill="none"
+                  className="transition-transform group-hover:translate-x-1"
+                >
+                  <path
+                    d="M2 6l3 3 5-5"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
               </>
             )}
           </button>
         </form>
 
-        <p className="text-center text-[0.85rem] text-t2 font-medium" style={{ marginTop: '2rem' }}>
-          Don't have an account?{' '}
-          <Link href="/auth/signup" className="text-lime hover:text-white hover:underline transition-colors font-semibold">
+        <p
+          className="text-center text-[0.85rem] text-t2 font-medium"
+          style={{ marginTop: "2rem" }}
+        >
+          Don't have an account?{" "}
+          <Link
+            href="/auth/signup"
+            className="text-lime hover:text-white hover:underline transition-colors font-semibold"
+          >
             Sign up
           </Link>
         </p>
