@@ -77,6 +77,15 @@ export async function POST(req: Request) {
     // ORDER ID
     const shopifyOrderId = String(body.id);
 
+    // IDEMPOTENCY CHECK — if this order was already processed (Shopify retry),
+    // return 200 immediately so Shopify stops retrying.
+    const existingTransaction = await prisma.transaction.findUnique({
+      where: { shopifyOrderId },
+    });
+    if (existingTransaction) {
+      return Response.json({ success: true, ignored: true });
+    }
+
     // VARIANT ID
     const variantId = body.line_items?.[0]?.variant_id;
 
@@ -145,6 +154,13 @@ export async function POST(req: Request) {
       };
 
       planName = "COMPLETE_BUNDLE";
+    }
+
+    // If variantId didn't match any known plan, do NOT touch the user's access.
+    // Writing the all-false default would wipe access the user already paid for.
+    if (!planName) {
+      console.warn("Unknown variantId received in webhook:", variantId);
+      return Response.json({ success: true, ignored: true });
     }
 
     // UPDATE USER ACCESS

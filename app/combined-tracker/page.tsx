@@ -19,8 +19,23 @@ export default function CombinedTrackerPage() {
   const [isLoggingOut, setIsLoggingOut] = useState(false);
 
   useEffect(() => {
-    if (!loading && !user) {
-      router.push("/landing");
+    if (!loading) {
+      if (!user) {
+        router.push("/landing");
+      } else {
+        const access = ((user as any).access ?? {}) as { habit_tracker?: boolean; budget_tracker?: boolean };
+        if (!access.habit_tracker && !access.budget_tracker) {
+          // No products at all
+          router.push("/landing");
+        } else if (access.habit_tracker && !access.budget_tracker) {
+          // Only has habit tracker
+          router.push("/habitTracker");
+        } else if (!access.habit_tracker && access.budget_tracker) {
+          // Only has budget tracker
+          router.push("/budget-tracker");
+        }
+        // Both true → stay on combined-tracker ✓
+      }
     }
   }, [loading, user]);
 

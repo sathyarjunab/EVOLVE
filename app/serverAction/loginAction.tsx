@@ -32,6 +32,11 @@ export default async function login(email: string, password: string) {
 
     if (!isSame) throw new AppError("Invalid credentials", 401);
 
+    await prisma.user.update({
+      where: { id: user.id },
+      data: { lastLogin: new Date() },
+    });
+
     const token = await getToken(user);
 
     (await cookies()).set("token", token, {

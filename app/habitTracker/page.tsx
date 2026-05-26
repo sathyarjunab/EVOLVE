@@ -43,9 +43,12 @@ export default function HabitFlowPage() {
       if (!user) {
         router.push("/landing");
       } else {
-        // Users with both trackers go to the combined tracker
-        const access = Array.isArray((user as any).access) ? (user as any).access as string[] : [];
-        if (access.includes("habit_tracker") && access.includes("money_tracker")) {
+        const access = ((user as any).access ?? {}) as { habit_tracker?: boolean; budget_tracker?: boolean };
+        if (!access.habit_tracker) {
+          // User hasn't purchased the habit tracker — send them home
+          router.push("/landing");
+        } else if (access.habit_tracker && access.budget_tracker) {
+          // User has both — redirect to combined tracker
           router.push("/combined-tracker");
         }
       }
