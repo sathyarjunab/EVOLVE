@@ -59,6 +59,7 @@ model User {
   budgetTransactions BudgetTransaction[]
   fixedDues          FixedDue[]
   savingsGoals       SavingsGoal[]
+  PasswordResetTokens PasswordResetToken[]
 
   @@map("users")
 }
@@ -344,4 +345,19 @@ model ShopifyWebhookLog {
   
   @@index([createdAt(sort: Desc)])
   @@map("shopify_webhook_logs")
+}
+
+model PasswordResetToken {
+  id         String   @id @default(uuid())
+
+  token      String   @unique @db.VarChar(255)
+
+  expiresAt  DateTime
+
+  userId     String
+  user       User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt  DateTime @default(now())
+
+  @@index([userId])
 }

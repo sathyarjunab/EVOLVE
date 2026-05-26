@@ -225,6 +225,14 @@ export default function SignupPage() {
             Log in
           </Link>
         </p>
+        <p className="text-center text-[0.8rem] text-t3 font-medium" style={{ marginTop: "0.75rem" }}>
+          <Link
+            href="/auth/forgot-password"
+            className="hover:text-purple transition-colors"
+          >
+            Forgot your password?
+          </Link>
+        </p>
       </div>
     </div>
   );
