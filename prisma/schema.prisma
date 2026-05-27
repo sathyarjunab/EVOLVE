@@ -60,6 +60,7 @@ model User {
   fixedDues          FixedDue[]
   savingsGoals       SavingsGoal[]
   PasswordResetTokens PasswordResetToken[]
+  ShopifyWebhookLogs ShopifyWebhookLog[]
 
   @@map("users")
 }
@@ -342,6 +343,9 @@ model ShopifyWebhookLog {
   payload     Json
 
   createdAt   DateTime @default(now())
+
+  userId            String?
+  user              User?     @relation(fields: [userId], references: [id])
   
   @@index([createdAt(sort: Desc)])
   @@map("shopify_webhook_logs")
