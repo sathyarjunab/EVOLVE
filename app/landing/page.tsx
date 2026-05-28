@@ -120,8 +120,8 @@ function LandingContent() {
             {isLoggingOut ? "Logging out…" : "Logout"}
           </button>
         ) : (
-          <a className="nav-cta" href="#trackers">
-            Get Started $15
+          <a className="nav-cta" href="/auth/login">
+            Login
           </a>
         )}
       </nav>
@@ -2334,7 +2334,9 @@ function LandingContent() {
                 if (loading) return null;
                 const currentUser = user ?? profile;
                 const access = currentUser?.access as Access | undefined;
-                const hasBoth = access?.habit_tracker === true && access?.budget_tracker === true;
+                const hasBoth =
+                  access?.habit_tracker === true &&
+                  access?.budget_tracker === true;
                 return hasBoth ? (
                   <a
                     className="t-btn t-btn-hero"
