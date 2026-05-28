@@ -35,10 +35,6 @@ function LandingContent() {
       });
       const data = await res.json();
 
-      if (res.status === 401) {
-        router.push("/auth/login");
-        return;
-      }
       if (res.status === 409) {
         toast.error("You already have this subscription!");
         router.push(data.redirect);
