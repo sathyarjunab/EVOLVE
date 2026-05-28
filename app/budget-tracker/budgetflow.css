@@ -40,9 +40,9 @@ nav{height:60px;flex-shrink:0;background:var(--s1);border-bottom:1px solid var(-
 
 /* ── TOP ROW ── */
 .top-row{display:flex;align-items:stretch;gap:14px;flex-shrink:0}
-.welcome{flex-shrink:0;width:196px}
+.welcome{flex-shrink:0;width:196px;overflow:hidden;min-width:0}
 .welcome-sub{font-size:.75rem;color:var(--t2);margin-bottom:4px}
-.welcome-name{font-family:'Outfit',sans-serif;font-size:1.9rem;font-weight:800;color:var(--t1);line-height:1.1;letter-spacing:-.03em}
+.welcome-name{font-family:'Outfit',sans-serif;font-size:1.9rem;font-weight:800;color:var(--t1);line-height:1.1;letter-spacing:-.03em;word-break:break-word;overflow-wrap:break-word}
 .welcome-name span{color:var(--lime)}
 .month-badge{display:inline-block;margin-top:8px;background:rgba(200,255,77,.1);color:var(--lime);font-size:.65rem;font-weight:700;padding:3px 10px;border-radius:20px;letter-spacing:.04em;border:1px solid rgba(200,255,77,.18)}
 
