@@ -68,6 +68,25 @@ function applyState(data) {
   return false;
 }
 
+/* Disables a modal's save+delete buttons while an API call is in flight.
+   Saves and restores the save-button label via data-orig. */
+function setModalLoading(saveTxtId, delBtnId, isLoading) {
+  const textEl  = saveTxtId ? document.getElementById(saveTxtId) : null;
+  const delEl   = delBtnId  ? document.getElementById(delBtnId)  : null;
+  const saveBtn = textEl ? textEl.closest('button') : null;
+  if (saveBtn) saveBtn.disabled = isLoading;
+  if (textEl) {
+    if (isLoading) {
+      if (!textEl.dataset.orig) textEl.dataset.orig = textEl.textContent;
+      textEl.textContent = 'Saving…';
+    } else if (textEl.dataset.orig) {
+      textEl.textContent = textEl.dataset.orig;
+      delete textEl.dataset.orig;
+    }
+  }
+  if (delEl) delEl.disabled = isLoading;
+}
+
 /* ══ HELPERS ══ */
 const getCurrency = () => (state.currency || '$');
 const fmt = n => getCurrency() + Math.abs(n).toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2});
@@ -481,7 +500,7 @@ async function submitGoal() {
   const target = parseFloat(document.getElementById('goalTarget').value);
   const current = parseFloat(document.getElementById('goalCurrent').value) || 0;
   if(!name || !target || target <= 0) return;
-
+  setModalLoading('goalSaveTxt', 'goalDelBtn', true);
   try {
     let data;
     if(goalEditId) {
@@ -494,11 +513,15 @@ async function submitGoal() {
     refreshAll();
   } catch(e) {
     console.error('submitGoal error:', e);
+  } finally {
+    setModalLoading('goalSaveTxt', 'goalDelBtn', false);
   }
 }
 
 async function deleteGoal() {
   if(!goalEditId) return;
+  const delBtn = document.getElementById('goalDelBtn');
+  if (delBtn) delBtn.disabled = true;
   try {
     const data = await apiFetch('/api/budget/goal', 'DELETE', { id: goalEditId });
     applyState(data);
@@ -506,6 +529,8 @@ async function deleteGoal() {
     refreshAll();
   } catch(e) {
     console.error('deleteGoal error:', e);
+  } finally {
+    if (delBtn) delBtn.disabled = false;
   }
 }
 
@@ -608,7 +633,7 @@ async function submitTx() {
   if(!name || !amt || amt<=0 || !date) return;
   const cat = txType === 'savings' ? 'Savings' : document.getElementById('txCat').value;
   const goalId = txType === 'savings' ? (document.getElementById('txGoalSel').value || null) : null;
-
+  setModalLoading('txSaveTxt', 'txDelBtn', true);
   try {
     let data;
     if(txEditId) {
@@ -621,11 +646,15 @@ async function submitTx() {
     refreshAll();
   } catch(e) {
     console.error('submitTx error:', e);
+  } finally {
+    setModalLoading('txSaveTxt', 'txDelBtn', false);
   }
 }
 
 async function deleteTx() {
   if(!txEditId) return;
+  const delBtn = document.getElementById('txDelBtn');
+  if (delBtn) delBtn.disabled = true;
   try {
     const data = await apiFetch('/api/budget/transaction', 'DELETE', { id: txEditId });
     applyState(data);
@@ -633,6 +662,8 @@ async function deleteTx() {
     refreshAll();
   } catch(e) {
     console.error('deleteTx error:', e);
+  } finally {
+    if (delBtn) delBtn.disabled = false;
   }
 }
 
@@ -669,7 +700,7 @@ async function submitIncome() {
   const amt=parseFloat(document.getElementById('incAmt').value);
   const type=document.getElementById('incType').value;
   if(!name||!amt||amt<=0)return;
-
+  setModalLoading('incSaveTxt', 'incDelBtn', true);
   try {
     let data;
     if(incEditId){
@@ -682,11 +713,15 @@ async function submitIncome() {
     refreshAll();
   } catch(e) {
     console.error('submitIncome error:', e);
+  } finally {
+    setModalLoading('incSaveTxt', 'incDelBtn', false);
   }
 }
 
 async function deleteIncome() {
   if(!incEditId)return;
+  const delBtn = document.getElementById('incDelBtn');
+  if (delBtn) delBtn.disabled = true;
   try {
     const data = await apiFetch('/api/budget/income', 'DELETE', { id: incEditId });
     applyState(data);
@@ -694,6 +729,8 @@ async function deleteIncome() {
     refreshAll();
   } catch(e) {
     console.error('deleteIncome error:', e);
+  } finally {
+    if (delBtn) delBtn.disabled = false;
   }
 }
 
@@ -733,7 +770,7 @@ async function submitDue() {
   const day=parseInt(document.getElementById('dueDay').value);
   const cat=document.getElementById('dueCat').value;
   if(!name||!amt||amt<=0||!day||day<1||day>31)return;
-
+  setModalLoading('dueSaveTxt', 'dueDelBtn', true);
   try {
     let data;
     if(dueEditId){
@@ -746,11 +783,15 @@ async function submitDue() {
     refreshAll();
   } catch(e) {
     console.error('submitDue error:', e);
+  } finally {
+    setModalLoading('dueSaveTxt', 'dueDelBtn', false);
   }
 }
 
 async function deleteDue() {
   if(!dueEditId)return;
+  const delBtn = document.getElementById('dueDelBtn');
+  if (delBtn) delBtn.disabled = true;
   try {
     const data = await apiFetch('/api/budget/due', 'DELETE', { id: dueEditId });
     applyState(data);
@@ -758,6 +799,8 @@ async function deleteDue() {
     refreshAll();
   } catch(e) {
     console.error('deleteDue error:', e);
+  } finally {
+    if (delBtn) delBtn.disabled = false;
   }
 }
 
@@ -772,7 +815,7 @@ function openBankModal() {
 async function saveBankModal() {
   const val = parseFloat(document.getElementById('bankBalInput').value);
   if(isNaN(val) || val < 0) return;
-
+  setModalLoading('bankSaveTxt', null, true);
   try {
     const data = await apiFetch('/api/budget/settings', 'PATCH', {
       bankBalance: val,
@@ -783,6 +826,8 @@ async function saveBankModal() {
     refreshAll();
   } catch(e) {
     console.error('saveBankModal error:', e);
+  } finally {
+    setModalLoading('bankSaveTxt', null, false);
   }
 }
 
@@ -835,7 +880,7 @@ async function submitOnboard() {
     document.getElementById('obIncome').focus();
     return;
   }
-
+  setModalLoading('obSaveTxt', null, true);
   try {
     const data = await apiFetch('/api/budget/income', 'POST', {
       name: 'Primary Income', amount: income, emoji: '💼', type: 'monthly'
@@ -847,6 +892,8 @@ async function submitOnboard() {
   } catch(e) {
     const err = document.getElementById('obErr');
     if (err) { err.textContent = 'Failed to save. Please try again.'; err.style.display = 'block'; }
+  } finally {
+    setModalLoading('obSaveTxt', null, false);
   }
 }
 

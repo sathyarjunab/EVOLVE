@@ -503,7 +503,9 @@ async function submitTx(){
   const cat=txType==='savings'?'Savings':document.getElementById('txCat').value;
   const goalId=txType==='savings'?(document.getElementById('txGoalSel').value||null):null;
   const btn=document.getElementById('txOverlay').querySelector('.m-btn.save');
-  if(btn){btn.disabled=true;btn.textContent='Saving…';}
+  const saveTxt=document.getElementById('txSaveTxt');
+  if(btn)btn.disabled=true;
+  if(saveTxt){saveTxt.dataset.orig=saveTxt.textContent;saveTxt.textContent='Saving…';}
   try{
     if(txEditId){
       await bApiCall('transaction',{id:txEditId,type:txType,name,amount:amt,category:cat,date,note,goalId},'PUT');
@@ -511,7 +513,10 @@ async function submitTx(){
       await bApiCall('transaction',{type:txType,name,amount:amt,category:cat,date,note,goalId},'POST');
     }
     closeModal('txOverlay');refreshAll();
-  }catch(e){}finally{if(btn){btn.disabled=false;document.getElementById('txSaveTxt').textContent=txEditId?'Save':'Add';}}
+  }catch(e){}finally{
+    if(btn)btn.disabled=false;
+    if(saveTxt&&saveTxt.dataset.orig){saveTxt.textContent=saveTxt.dataset.orig;delete saveTxt.dataset.orig;}
+  }
 }
 async function deleteTx(){
   if(!txEditId)return;

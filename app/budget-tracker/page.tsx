@@ -56,14 +56,22 @@ export default function BudgetFlowPage() {
       <div
         style={{
           display: "flex",
+          flexDirection: "column",
           height: "100vh",
           justifyContent: "center",
           alignItems: "center",
+          gap: "12px",
           color: "var(--t2)",
           fontFamily: "Manrope, sans-serif",
           fontSize: "0.85rem",
         }}
       >
+        <Loader2
+          size={28}
+          strokeWidth={1.5}
+          className="animate-spin"
+          style={{ color: "var(--lime)" }}
+        />
         Loading BudgetFlow…
       </div>
     );
@@ -1663,7 +1671,7 @@ export default function BudgetFlowPage() {
                   strokeLinejoin="round"
                 />
               </svg>
-              Save
+              <span id="bankSaveTxt">Save</span>
             </button>
           </div>
         </div>
@@ -1720,7 +1728,7 @@ export default function BudgetFlowPage() {
                 strokeLinejoin="round"
               />
             </svg>
-            Get Started
+            <span id="obSaveTxt">Get Started</span>
           </button>
         </div>
       </div>
