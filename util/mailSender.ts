@@ -14,7 +14,7 @@ export const sendMail = async (emailData: {
   client
     .sendMail({
       from: {
-        address: "noreply@scalenevolve.com",
+        address: process.env.MAIL_FROM!,
         name: "noreply",
       },
       to: [
