@@ -47,7 +47,7 @@ export async function POST(req: NextRequest) {
 
     await sendMail({
       to: user.email,
-      user: user.name,
+      userName: user.name,
       subject: "Reset your Evolve password",
       htmlBody: resetPasswordEmail(user.name, resetUrl),
     });
@@ -75,10 +75,7 @@ export async function PUT(req: NextRequest) {
     const newPassword = passwordSchema.parse(body.password);
 
     // The email link contains the raw token; the DB stores its SHA-256 hash
-    const hashedToken = crypto
-      .createHash("sha256")
-      .update(token)
-      .digest("hex");
+    const hashedToken = crypto.createHash("sha256").update(token).digest("hex");
 
     const record = await prisma.passwordResetToken.findUnique({
       where: { token: hashedToken },
@@ -95,7 +92,9 @@ export async function PUT(req: NextRequest) {
     if (dayjs().isAfter(dayjs(record.expiresAt))) {
       await prisma.passwordResetToken.delete({ where: { token: hashedToken } });
       return new Response(
-        JSON.stringify({ error: "This reset link has expired. Please request a new one." }),
+        JSON.stringify({
+          error: "This reset link has expired. Please request a new one.",
+        }),
         { status: 400 },
       );
     }

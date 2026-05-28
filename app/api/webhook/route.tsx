@@ -11,8 +11,7 @@ const BASE_URL = process.env.NEXT_PUBLIC_DOMAIN ?? "https://scalenevolve.com";
 /** Generates a cryptographically random human-readable password */
 function generatePassword(length: number): string {
   // Omit visually ambiguous characters (0, O, I, l, 1)
-  const chars =
-    "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789!@#$%";
+  const chars = "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789!@#$%";
   const bytes = crypto.randomBytes(length);
   return Array.from(bytes)
     .map((b) => chars[b % chars.length])
@@ -160,14 +159,19 @@ export async function POST(req: Request) {
         };
 
         user = await prisma.user.create({
-          data: { name, email: customerEmail, password: hashedPassword, access: initialAccess },
+          data: {
+            name,
+            email: customerEmail,
+            password: hashedPassword,
+            access: initialAccess,
+          },
         });
 
         // Send welcome email with temporary credentials.
         // Fire-and-forget: a mail failure must NOT block the order from completing.
         sendMail({
           to: customerEmail,
-          user: name,
+          userName: name,
           subject: "Welcome to Evolve — Your account is ready",
           htmlBody: newAccountEmail(
             name,
@@ -215,7 +219,6 @@ export async function POST(req: Request) {
     logSuccess = true;
     return Response.json({ success: true });
   } catch (error) {
-    console.error(error);
     logError = JSON.stringify(error);
     return Response.json({ success: false }, { status: 200 });
   } finally {

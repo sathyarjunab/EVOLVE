@@ -1,52 +1,33 @@
-import axios from "axios";
+import { SendMailClient } from "zeptomail";
 
 export const sendMail = async (emailData: {
-  to: String;
-  user: string;
-  htmlBody: String;
+  to: string;
+  userName: string;
+  htmlBody: string;
   subject: string;
 }) => {
-  try {
-    const response = await axios.post(
-      "https://api.zeptomail.in/v1.1/email",
-      {
-        from: {
-          address: "noreply@scalenevolve.com",
-          name: "EVOLVE",
-        },
+  let client = new SendMailClient({
+    url: process.env.ZEPTO_URL!,
+    token: process.env.ZEPTO_TOKEN!,
+  });
 
-        to: [
-          {
-            email_address: {
-              address: emailData.to,
-              name: emailData.user,
-            },
+  client
+    .sendMail({
+      from: {
+        address: "noreply@scalenevolve.com",
+        name: "noreply",
+      },
+      to: [
+        {
+          email_address: {
+            address: emailData.to,
+            name: emailData.userName,
           },
-        ],
-
-        subject: emailData.subject,
-
-        htmlbody: emailData.htmlBody,
-        track_clicks: true,
-        track_opens: true,
-        client_reference: "reference",
-        mime_headers: {
-          message: "value",
         },
-      },
-      {
-        headers: {
-          Accept: "application/json",
-
-          "Content-Type": "application/json",
-
-          Authorization: `Zoho-enczapikey ${process.env.ZP_API_KEY}`,
-        },
-      },
-    );
-
-    console.log(response.data);
-  } catch (error: any) {
-    console.error(error.response?.data || error.message);
-  }
+      ],
+      subject: emailData.subject,
+      htmlbody: emailData.htmlBody,
+    })
+    .then((resp) => console.log("success"))
+    .catch((error) => console.log("error"));
 };
