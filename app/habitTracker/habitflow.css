@@ -65,9 +65,9 @@ nav{height:60px;flex-shrink:0;background:var(--s1);border-bottom:1px solid var(-
 
 /* ── TOP ROW ─────────────────────────── */
 .top-row{display:flex;align-items:stretch;gap:16px;flex-shrink:0}
-.welcome{flex-shrink:0;width:210px}
+.welcome{flex-shrink:0;width:210px;overflow:hidden;min-width:0}
 .welcome-sub{font-size:.75rem;color:var(--t2);margin-bottom:4px}
-.welcome-name{font-family:'Outfit',sans-serif;font-size:2rem;font-weight:800;color:var(--t1);line-height:1.1;letter-spacing:-.03em}
+.welcome-name{font-family:'Outfit',sans-serif;font-size:2rem;font-weight:800;color:var(--t1);line-height:1.1;letter-spacing:-.03em;word-break:break-word;overflow-wrap:break-word}
 .badge-prem{display:inline-block;margin-top:8px;background:var(--purple);color:#fff;font-size:.65rem;font-weight:700;padding:3px 10px;border-radius:20px;letter-spacing:.04em;text-transform:uppercase}
 .stat-cards{display:flex;gap:12px;flex:1}
 .scard{flex:1;background:var(--s1);border-radius:16px;border:1px solid var(--border);padding:12px 14px;position:relative;display:flex;flex-direction:column;justify-content:space-between;min-height:0}

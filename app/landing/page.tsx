@@ -101,7 +101,14 @@ function LandingContent() {
             />
           </svg>
         </button>
-        {user ? (
+        {loading ? (
+          <Loader2
+            size={18}
+            strokeWidth={1.5}
+            className="animate-spin"
+            style={{ color: "var(--t3)", flexShrink: 0 }}
+          />
+        ) : user ? (
           <button
             className="nav-cta"
             onClick={handleLogout}
