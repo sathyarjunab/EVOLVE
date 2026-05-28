@@ -29,5 +29,5 @@ export const sendMail = async (emailData: {
       htmlbody: emailData.htmlBody,
     })
     .then((resp) => console.log("success"))
-    .catch((error) => console.log("error"));
+    .catch((error) => console.log("error while sending email", error));
 };
