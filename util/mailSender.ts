@@ -6,13 +6,13 @@ export const sendMail = async (emailData: {
   htmlBody: string;
   subject: string;
 }) => {
-  let client = new SendMailClient({
+  const client = new SendMailClient({
     url: process.env.ZEPTO_URL!,
     token: process.env.ZEPTO_TOKEN!,
   });
 
-  client
-    .sendMail({
+  try {
+    const resp = await client.sendMail({
       from: {
         address: process.env.MAIL_FROM!,
         name: "noreply",
@@ -27,7 +27,13 @@ export const sendMail = async (emailData: {
       ],
       subject: emailData.subject,
       htmlbody: emailData.htmlBody,
-    })
-    .then((resp) => console.log("success"))
-    .catch((error) => console.log("error while sending email", error));
+    });
+
+    console.log("Mail success", resp);
+
+    return resp;
+  } catch (error) {
+    console.error("Mail failed", error);
+    throw error;
+  }
 };
