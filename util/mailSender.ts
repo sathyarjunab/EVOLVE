@@ -6,12 +6,12 @@ export const sendMail = async (emailData: {
   htmlBody: string;
   subject: string;
 }) => {
-  const client = new SendMailClient({
-    url: process.env.ZEPTO_URL!,
-    token: process.env.ZEPTO_TOKEN!,
-  });
-
   try {
+    const client = new SendMailClient({
+      url: process.env.ZEPTO_URL!,
+      token: process.env.ZEPTO_TOKEN!,
+    });
+
     const resp = await client.sendMail({
       from: {
         address: process.env.MAIL_FROM!,

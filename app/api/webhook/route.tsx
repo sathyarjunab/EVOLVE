@@ -197,7 +197,7 @@ export async function POST(req: Request) {
 
         // Send welcome email with temporary credentials.
         // Fire-and-forget: a mail failure must NOT block the order from completing.
-        sendMail({
+        await sendMail({
           to: customerEmail,
           userName: name,
           subject: "Welcome to Evolve — Your account is ready",
