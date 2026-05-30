@@ -1,10 +1,11 @@
-'use client'
+"use client";
 
 import type { Metadata } from "next";
 import Script from "next/script";
 import { AuthProvider } from "./AuthContextProvider";
 import "./globals.css";
 import { Toaster } from "sonner";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 
 export default function RootLayout({
   children,
@@ -12,10 +13,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html
-      lang="en"
-      className={`h-full antialiased`}
-    >
+    <html lang="en" className={`h-full antialiased`}>
       <head>
         {/* Google Tag Manager */}
         <Script
@@ -32,6 +30,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
         {/* End Google Tag Manager */}
       </head>
       <body className="min-h-full flex flex-col">
+        <SpeedInsights />
         {/* Google Tag Manager (noscript) */}
         <noscript>
           <iframe
@@ -42,12 +41,19 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
           />
         </noscript>
         {/* End Google Tag Manager (noscript) */}
-        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, zIndex: 9999, pointerEvents: 'none' }}>
+        <div
+          style={{
+            position: "fixed",
+            top: 0,
+            left: 0,
+            right: 0,
+            zIndex: 9999,
+            pointerEvents: "none",
+          }}
+        >
           <Toaster />
         </div>
-        <AuthProvider>
-          {children}
-        </AuthProvider>
+        <AuthProvider>{children}</AuthProvider>
       </body>
     </html>
   );
