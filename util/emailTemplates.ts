@@ -88,9 +88,7 @@ export function newAccountEmail(
           <!-- Footer -->
           <tr>
             <td style="padding:20px 40px 28px;background-color:#1B1B1F;border-top:1px solid #38383F;border-radius:0 0 18px 18px;text-align:center;">
-              <p style="margin:0 0 8px;font-family:'Outfit',Arial,Helvetica,sans-serif;font-size:16px;font-weight:700;color:#C8FF4D;letter-spacing:2px;">
-                EVOLVE
-              </p>
+              <img src="${new URL(loginUrl).origin}/evolve-logo.svg" alt="Evolve" width="120" height="auto" style="display:inline-block;margin-bottom:8px;" />
               <p style="margin:0;font-size:11px;color:#55555F;line-height:1.7;">
                 &copy; 2026 Evolve. All rights reserved.<br/>
                 You received this because you purchased an Evolve plan.
@@ -193,9 +191,7 @@ export function resetPasswordEmail(name: string, resetUrl: string): string {
           <!-- Footer -->
           <tr>
             <td style="padding:20px 40px 28px;background-color:#1B1B1F;border-top:1px solid #38383F;border-radius:0 0 18px 18px;text-align:center;">
-              <p style="margin:0 0 8px;font-family:'Outfit',Arial,Helvetica,sans-serif;font-size:16px;font-weight:700;color:#C8FF4D;letter-spacing:2px;">
-                EVOLVE
-              </p>
+              <img src="${new URL(resetUrl).origin}/evolve-logo.svg" alt="Evolve" width="120" height="auto" style="display:inline-block;margin-bottom:8px;" />
               <p style="margin:0;font-size:11px;color:#55555F;line-height:1.7;">
                 &copy; 2026 Evolve. All rights reserved.<br/>
                 You received this because a password reset was requested for your account.
