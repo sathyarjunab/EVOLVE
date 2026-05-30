@@ -12,11 +12,11 @@ const BASE_URL = process.env.NEXT_PUBLIC_DOMAIN ?? "https://scalenevolve.com";
  *  password policy: min 8 chars, uppercase, lowercase, digit, special char.
  *  Omits visually ambiguous characters (0, O, I, l, 1). */
 function generatePassword(length: number): string {
-  const upper   = "ABCDEFGHJKLMNPQRSTUVWXYZ";
-  const lower   = "abcdefghijkmnpqrstuvwxyz";
-  const digits  = "23456789";
+  const upper = "ABCDEFGHJKLMNPQRSTUVWXYZ";
+  const lower = "abcdefghijkmnpqrstuvwxyz";
+  const digits = "23456789";
   const special = "!@#$%";
-  const all     = upper + lower + digits + special;
+  const all = upper + lower + digits + special;
 
   const randomChar = (charset: string) => {
     const bytes = crypto.randomBytes(1);
@@ -32,9 +32,8 @@ function generatePassword(length: number): string {
   ];
 
   // Fill the remaining slots from the full charset
-  const rest = Array.from(
-    { length: length - required.length },
-    () => randomChar(all),
+  const rest = Array.from({ length: length - required.length }, () =>
+    randomChar(all),
   );
 
   // Shuffle so the required chars aren't always at fixed positions
@@ -127,11 +126,11 @@ export async function POST(req: Request) {
     if (variantId === plans.HabitTracker.variantId) {
       newAccess = { habit_tracker: true };
       planName = "HABIT_TRACKER";
-    } else if (variantId === plans.BudgetTracker.variantId) {
-      newAccess = { budget_tracker: true };
-      planName = "BUDGET_TRACKER";
+    } else if (variantId === plans.MoneyTracker.variantId) {
+      newAccess = { money_tracker: true };
+      planName = "MONEY_TRACKER";
     } else if (variantId === plans.CombinedTracker.variantId) {
-      newAccess = { habit_tracker: true, budget_tracker: true };
+      newAccess = { habit_tracker: true, money_tracker: true };
       planName = "COMPLETE_BUNDLE";
     }
 
@@ -184,7 +183,7 @@ export async function POST(req: Request) {
         // Set the correct access flags at creation time
         const initialAccess: Access = {
           habit_tracker: newAccess.habit_tracker ?? false,
-          budget_tracker: newAccess.budget_tracker ?? false,
+          money_tracker: newAccess.money_tracker ?? false,
         };
 
         user = await prisma.user.create({

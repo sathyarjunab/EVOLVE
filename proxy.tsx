@@ -4,7 +4,7 @@ import { toast } from "sonner";
 
 export type Access = {
   habit_tracker: boolean;
-  budget_tracker: boolean;
+  money_tracker: boolean;
 };
 
 export async function proxy(request: NextRequest) {
@@ -32,12 +32,12 @@ export async function proxy(request: NextRequest) {
   // Decide target route
   let target = "/landing";
 
-  if (access.habit_tracker && access.budget_tracker) {
+  if (access.habit_tracker && access.money_tracker) {
     target = "/combined-tracker";
   } else if (access.habit_tracker) {
     target = "/habitTracker";
-  } else if (access.budget_tracker) {
-    target = "/budget-tracker";
+  } else if (access.money_tracker) {
+    target = "/money-tracker";
   }
 
   // Prevent infinite redirect loop

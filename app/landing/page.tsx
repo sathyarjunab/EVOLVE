@@ -992,24 +992,24 @@ function LandingContent() {
                 if (loading) return null;
                 const currentUser = user ?? profile;
                 const access = currentUser?.access as Access | undefined;
-                const hasBudget = access?.budget_tracker === true;
+                const hasBudget = access?.money_tracker === true;
                 const hasHabit = access?.habit_tracker === true;
                 const hasBoth = hasBudget && hasHabit;
                 return hasBudget ? (
                   <a
                     className="t-btn"
-                    href={hasBoth ? "/combined-tracker" : "/budget-tracker"}
+                    href={hasBoth ? "/combined-tracker" : "/money-tracker"}
                     target="_self"
                   >
-                    {hasBoth ? "Open Combined Tracker" : "Open Budget Tracker"}
+                    {hasBoth ? "Open Combined Tracker" : "Open Money Tracker"}
                   </a>
                 ) : (
                   <button
                     className="t-btn"
                     disabled={buyLoading !== null}
-                    onClick={() => handleBuy("budget_tracker")}
+                    onClick={() => handleBuy("money_tracker")}
                   >
-                    {buyLoading === "budget_tracker" ? (
+                    {buyLoading === "money_tracker" ? (
                       <Loader2 size={16} className="animate-spin" />
                     ) : (
                       "Get Started at $15"
@@ -2343,7 +2343,7 @@ function LandingContent() {
                 const access = currentUser?.access as Access | undefined;
                 const hasBoth =
                   access?.habit_tracker === true &&
-                  access?.budget_tracker === true;
+                  access?.money_tracker === true;
                 return hasBoth ? (
                   <a
                     className="t-btn t-btn-hero"
@@ -3351,7 +3351,7 @@ function LandingContent() {
                 const currentUser = user ?? profile;
                 const access = currentUser?.access as Access | undefined;
                 const hasHabit = access?.habit_tracker === true;
-                const hasBudget = access?.budget_tracker === true;
+                const hasBudget = access?.money_tracker === true;
                 const hasBoth = hasHabit && hasBudget;
                 return hasHabit ? (
                   <a

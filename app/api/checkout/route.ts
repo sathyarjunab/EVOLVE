@@ -4,7 +4,7 @@ import { prisma } from "@/prisma/prisma";
 import { Access } from "@/proxy";
 import { plans } from "@/util/types";
 
-export type CheckoutProduct = "budget_tracker" | "habit_tracker" | "bundle";
+export type CheckoutProduct = "money_tracker" | "habit_tracker" | "bundle";
 
 export async function POST(req: NextRequest) {
   try {
@@ -13,7 +13,7 @@ export async function POST(req: NextRequest) {
     const product: CheckoutProduct = body.product;
     if (
       !product ||
-      !["budget_tracker", "habit_tracker", "bundle"].includes(product)
+      !["money_tracker", "habit_tracker", "bundle"].includes(product)
     ) {
       return NextResponse.json({ error: "invalid_product" }, { status: 400 });
     }
@@ -28,17 +28,17 @@ export async function POST(req: NextRequest) {
     if (dbUser) {
       const access = (dbUser.access ?? {}) as Access;
 
-      if (product === "budget_tracker" && access.budget_tracker) {
+      if (product === "money_tracker" && access.money_tracker) {
         const redirect = access.habit_tracker
           ? "/combined-tracker"
-          : "/budget-tracker";
+          : "/money-tracker";
         return NextResponse.json(
           { error: "already_subscribed", redirect },
           { status: 409 },
         );
       }
       if (product === "habit_tracker" && access.habit_tracker) {
-        const redirect = access.budget_tracker
+        const redirect = access.money_tracker
           ? "/combined-tracker"
           : "/habitTracker";
         return NextResponse.json(
@@ -46,7 +46,11 @@ export async function POST(req: NextRequest) {
           { status: 409 },
         );
       }
-      if (product === "bundle" && access.habit_tracker && access.budget_tracker) {
+      if (
+        product === "bundle" &&
+        access.habit_tracker &&
+        access.money_tracker
+      ) {
         return NextResponse.json(
           { error: "already_subscribed", redirect: "/combined-tracker" },
           { status: 409 },
@@ -56,8 +60,8 @@ export async function POST(req: NextRequest) {
 
     // 4. Pick the correct Shopify cart URL
     let baseUrl: string;
-    if (product === "budget_tracker") {
-      baseUrl = plans.BudgetTracker.checkoutUrl;
+    if (product === "money_tracker") {
+      baseUrl = plans.MoneyTracker.checkoutUrl;
     } else if (product === "habit_tracker") {
       baseUrl = plans.HabitTracker.checkoutUrl;
     } else {
