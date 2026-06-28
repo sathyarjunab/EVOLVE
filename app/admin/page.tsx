@@ -9,6 +9,7 @@ import { TabType, UserRecord } from "./components/types";
 import AdminSidebar from "./components/AdminSidebar";
 import DashboardView from "./components/DashboardView";
 import ListUsersView from "./components/ListUsersView";
+import ViewLinksModal from "./components/ViewLinksModal";
 import EditUserModal from "./components/EditUserModal";
 import AddLinkView from "./components/AddLinkView";
 
@@ -37,8 +38,9 @@ export default function AdminPage() {
     setPage(1);
   };
 
-  // Edit modal state
+  // Modal state
   const [editingUser, setEditingUser] = useState<UserRecord | null>(null);
+  const [viewingLinksInfluencer, setViewingLinksInfluencer] = useState<UserRecord | null>(null);
 
   // Debounce search input
   useEffect(() => {
@@ -210,7 +212,7 @@ export default function AdminPage() {
             totalCount={totalCount}
             fetching={fetching}
             fetchUsers={fetchUsers}
-            onEditUser={setEditingUser}
+            onViewLinks={setViewingLinksInfluencer}
             filterType="INFLUENCER"
           />
         )}
@@ -227,6 +229,14 @@ export default function AdminPage() {
             setUsers((prev) => prev.map((u) => (u.id === updated.id ? updated : u)));
             setEditingUser(null);
           }}
+        />
+      )}
+
+      {/* View influencer links modal */}
+      {viewingLinksInfluencer && (
+        <ViewLinksModal
+          influencer={viewingLinksInfluencer}
+          onClose={() => setViewingLinksInfluencer(null)}
         />
       )}
     </div>

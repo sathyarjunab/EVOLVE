@@ -23,7 +23,8 @@ interface ListUsersViewProps {
   totalCount: number;
   fetching: boolean;
   fetchUsers: () => void;
-  onEditUser: (user: UserRecord) => void;
+  onEditUser?: (user: UserRecord) => void;
+  onViewLinks?: (user: UserRecord) => void;
   filterType?: "USER" | "INFLUENCER" | "ADMIN" | "ALL";
 }
 
@@ -40,6 +41,7 @@ export default function ListUsersView({
   fetching,
   fetchUsers,
   onEditUser,
+  onViewLinks,
   filterType = "ALL",
 }: ListUsersViewProps) {
   return (
@@ -244,12 +246,21 @@ export default function ListUsersView({
                         {item.lastLogin ? formatDate(item.lastLogin) : <span className="text-t3 font-normal italic">Never</span>}
                       </td>
                       <td className="px-6 py-4 text-right">
-                        <button
-                          onClick={() => onEditUser(item)}
-                          className="px-3 py-1.5 bg-s2 hover:bg-s3 text-t2 hover:text-t1 border border-border/60 hover:border-border transition duration-200 rounded-lg text-xs font-semibold"
-                        >
-                          {filterType === "INFLUENCER" ? "Edit Influencer" : "Edit User"}
-                        </button>
+                        {filterType === "INFLUENCER" ? (
+                          <button
+                            onClick={() => onViewLinks?.(item)}
+                            className="px-3 py-1.5 bg-s2 hover:bg-s3 text-lime/80 hover:text-lime border border-border/60 hover:border-lime/30 transition duration-200 rounded-lg text-xs font-semibold"
+                          >
+                            View Links
+                          </button>
+                        ) : (
+                          <button
+                            onClick={() => onEditUser?.(item)}
+                            className="px-3 py-1.5 bg-s2 hover:bg-s3 text-t2 hover:text-t1 border border-border/60 hover:border-border transition duration-200 rounded-lg text-xs font-semibold"
+                          >
+                            Edit User
+                          </button>
+                        )}
                       </td>
                     </tr>
                   );
