@@ -24,6 +24,8 @@ interface CouponRecord {
   influencerId: string;
   code: string;
   couponCodeType: CouponCodeType;
+  // Prisma Decimal is serialized to a string over JSON
+  discountValue: string;
   createdAt: string;
   updatedAt: string;
 }
@@ -56,6 +58,7 @@ export default function ViewLinksModal({ influencer, onClose }: ViewLinksModalPr
 
   // Form state
   const [codeInput, setCodeInput] = useState("");
+  const [discountInput, setDiscountInput] = useState("");
   const [codeType, setCodeType] = useState<CouponCodeType>("PERCENTAGE");
   const [adding, setAdding] = useState(false);
   const [deletingId, setDeletingId] = useState<string | null>(null);
@@ -86,11 +89,24 @@ export default function ViewLinksModal({ influencer, onClose }: ViewLinksModalPr
   // ── Create ────────────────────────────────────────────────────
   const handleCreate = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    // ── Validate discount value ──────────────────────────────────
+    const discountValue = Number(discountInput);
+    if (!discountInput.trim() || Number.isNaN(discountValue) || discountValue <= 0) {
+      toast.error("Enter a discount value greater than 0.");
+      return;
+    }
+    if (codeType === "PERCENTAGE" && discountValue > 100) {
+      toast.error("Percentage discount cannot exceed 100.");
+      return;
+    }
+
     setAdding(true);
     try {
-      const payload: Record<string, string> = {
+      const payload: Record<string, string | number> = {
         influencerId: influencer.id,
         couponCodeType: codeType,
+        discountValue,
       };
       if (codeInput.trim()) payload.code = codeInput.trim();
 
@@ -104,6 +120,7 @@ export default function ViewLinksModal({ influencer, onClose }: ViewLinksModalPr
       if (res.ok && json.success) {
         setCoupons((prev) => [json.data, ...prev]);
         setCodeInput("");
+        setDiscountInput("");
         toast.success(`Coupon code "${json.data.code}" created.`);
       } else {
         // 409 = duplicate code — show as destructive toast
@@ -217,6 +234,25 @@ export default function ViewLinksModal({ influencer, onClose }: ViewLinksModalPr
             })}
           </div>
 
+          {/* Discount value input */}
+          <div className="relative">
+            <span className="absolute inset-y-0 left-3 flex items-center text-t3 pointer-events-none">
+              {codeType === "PERCENTAGE" ? <Percent size={13} /> : <DollarSign size={13} />}
+            </span>
+            <input
+              type="number"
+              inputMode="decimal"
+              min={0}
+              max={codeType === "PERCENTAGE" ? 100 : undefined}
+              step="0.01"
+              placeholder={codeType === "PERCENTAGE" ? "Discount percentage (e.g. 20)" : "Flat discount amount (e.g. 100)"}
+              value={discountInput}
+              onChange={(e) => setDiscountInput(e.target.value)}
+              className="w-full pl-9 pr-3 py-2.5 bg-s2 border border-border focus:border-purple focus:outline-none rounded-xl text-sm font-mono text-t1 placeholder:font-sans placeholder:text-t3 transition"
+              disabled={adding}
+            />
+          </div>
+
           {/* Code input + submit */}
           <div className="flex gap-2 items-stretch">
             <div className="relative flex-1">
@@ -274,6 +310,9 @@ export default function ViewLinksModal({ influencer, onClose }: ViewLinksModalPr
             <div className="flex flex-col gap-2 max-h-[32vh] overflow-y-auto pr-1">
               {coupons.map((coupon) => {
                 const meta = TYPE_META[coupon.couponCodeType];
+                const amount = Number(coupon.discountValue);
+                const discountLabel =
+                  coupon.couponCodeType === "PERCENTAGE" ? `${amount}% OFF` : `$${amount} OFF`;
                 return (
                   <div
                     key={coupon.id}
@@ -291,7 +330,7 @@ export default function ViewLinksModal({ influencer, onClose }: ViewLinksModalPr
                           className={`inline-flex items-center gap-1 text-[10px] font-extrabold tracking-wider border px-2 py-0.5 rounded-md font-mono shrink-0 ${meta.cls}`}
                         >
                           {meta.icon}
-                          {meta.short}
+                          {discountLabel}
                         </span>
                       </div>
                       <span className="text-[10px] text-t3">

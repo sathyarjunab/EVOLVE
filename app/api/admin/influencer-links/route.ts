@@ -8,21 +8,32 @@ const getCodesSchema = z.object({
   influencerId: z.string().uuid(),
 });
 
-const createCodeSchema = z.object({
-  influencerId: z.string().uuid(),
-  // code is optional — if omitted, we auto-generate one
-  code: z
-    .string()
-    .max(100)
-    .regex(
-      /^[A-Z0-9_-]+$/i,
-      "Code may only contain letters, numbers, hyphens and underscores",
-    )
-    .optional(),
-  couponCodeType: z.enum(["FLAT", "PERCENTAGE"], {
-    error: "Coupon type must be FLAT or PERCENTAGE",
-  }),
-});
+const createCodeSchema = z
+  .object({
+    influencerId: z.string().uuid(),
+    // code is optional — if omitted, we auto-generate one
+    code: z
+      .string()
+      .max(100)
+      .regex(
+        /^[A-Z0-9_-]+$/i,
+        "Code may only contain letters, numbers, hyphens and underscores",
+      )
+      .optional(),
+    couponCodeType: z.enum(["FLAT", "PERCENTAGE"], {
+      error: "Coupon type must be FLAT or PERCENTAGE",
+    }),
+    discountValue: z
+      .number({ error: "Discount value must be a number" })
+      .positive("Discount value must be greater than 0"),
+  })
+  .refine(
+    (data) => data.couponCodeType !== "PERCENTAGE" || data.discountValue <= 100,
+    {
+      path: ["discountValue"],
+      message: "Percentage discount cannot exceed 100",
+    },
+  );
 
 const deleteCodeSchema = z.object({
   id: z.string().uuid(),
@@ -102,7 +113,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const { influencerId, couponCodeType } = parsed.data;
+    const { influencerId, couponCodeType, discountValue } = parsed.data;
 
     // Verify influencer exists
     const influencer = await prisma.user.findUnique({
@@ -167,7 +178,7 @@ export async function POST(req: NextRequest) {
     }
 
     const newCode = await prisma.influencerLink.create({
-      data: { influencerId, code, couponCodeType },
+      data: { influencerId, code, couponCodeType, discountValue },
     });
 
     return NextResponse.json({ success: true, data: newCode });

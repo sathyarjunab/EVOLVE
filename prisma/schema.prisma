@@ -116,6 +116,7 @@ model InfluencerLink {
   influencerId   String         @map("influencer_id")
   code           String         @unique @db.VarChar(100) @map("code")
   couponCodeType CouponCodeType @map("coupon_code_type")
+  discountValue  Decimal        @db.Decimal(10, 2) @map("discount_value")
 
   createdAt      DateTime       @default(now()) @map("created_at")
   updatedAt      DateTime       @updatedAt @map("updated_at")
