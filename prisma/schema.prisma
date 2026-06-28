@@ -65,8 +65,8 @@ model User {
   createdAt  DateTime @default(now()) @map("created_at")
   updatedAt  DateTime @updatedAt @map("updated_at")
   userType   UserType @default(USER)
-  influencerType String @db.VarChar(255) @map("influencer_type")
-  influencerShare Decimal @db.Decimal(5,2) @map("influencer_share")
+  influencerType String @default("") @db.VarChar(255) @map("influencer_type")
+  influencerShare Decimal @default(0) @db.Decimal(5,2) @map("influencer_share")
 
   // Relations
   habits             Habit[]

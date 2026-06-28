@@ -127,23 +127,38 @@ function LandingContent() {
             style={{ color: "var(--t3)", flexShrink: 0 }}
           />
         ) : user ? (
-          <button
-            className="nav-cta"
-            onClick={handleLogout}
-            disabled={isLoggingOut}
-            style={{
-              cursor: isLoggingOut ? "not-allowed" : "pointer",
-              opacity: isLoggingOut ? 0.6 : 1,
-              display: "inline-flex",
-              alignItems: "center",
-              gap: "6px",
-            }}
+          <div
+            style={{ display: "inline-flex", alignItems: "center", gap: "10px" }}
           >
-            {isLoggingOut && (
-              <Loader2 size={13} strokeWidth={2} className="animate-spin" />
+            {/* Role-based dashboard link — only for admins and influencers */}
+            {user.userType === "ADMIN" && (
+              <a className="nav-cta" href="/admin">
+                Admin Panel
+              </a>
             )}
-            {isLoggingOut ? "Logging out…" : "Logout"}
-          </button>
+            {user.userType === "INFLUENCER" && (
+              <a className="nav-cta" href="/influencer">
+                Dashboard
+              </a>
+            )}
+            <button
+              className="nav-cta"
+              onClick={handleLogout}
+              disabled={isLoggingOut}
+              style={{
+                cursor: isLoggingOut ? "not-allowed" : "pointer",
+                opacity: isLoggingOut ? 0.6 : 1,
+                display: "inline-flex",
+                alignItems: "center",
+                gap: "6px",
+              }}
+            >
+              {isLoggingOut && (
+                <Loader2 size={13} strokeWidth={2} className="animate-spin" />
+              )}
+              {isLoggingOut ? "Logging out…" : "Logout"}
+            </button>
+          </div>
         ) : (
           <a className="nav-cta" href="/auth/login">
             Login
