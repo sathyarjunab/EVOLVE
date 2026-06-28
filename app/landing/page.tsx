@@ -1,12 +1,13 @@
 "use client";
 
 import { Loader2 } from "lucide-react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import Script from "next/script";
 import { Suspense, useEffect, useState } from "react";
 import { toast } from "sonner";
 import { useAuth } from "../AuthContextProvider";
 import getProfile, { passwordlessUser } from "../serverAction/getUser";
+import { storeCouponCode } from "../serverAction/couponAction";
 import "./landing.css";
 import { Access } from "@/proxy";
 import type { CheckoutProduct } from "@/app/api/checkout/route";
@@ -15,6 +16,16 @@ function LandingContent() {
   //context
   const { logout, user, loading } = useAuth();
   const router = useRouter();
+  const searchParams = useSearchParams();
+
+  // Capture an influencer coupon code from the URL (?coupon=CODE) and persist
+  // it to a cookie so it survives until the user reaches checkout.
+  useEffect(() => {
+    const coupon = searchParams.get("coupon");
+    if (coupon) {
+      storeCouponCode(coupon);
+    }
+  }, [searchParams]);
 
   const [profile, setProfile] = useState<passwordlessUser | null>(null);
   const [isLoggingOut, setIsLoggingOut] = useState(false);

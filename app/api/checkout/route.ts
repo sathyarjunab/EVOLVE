@@ -3,6 +3,7 @@ import { getUser } from "@/util/serverAuthHelper";
 import { prisma } from "@/prisma/prisma";
 import { Access } from "@/proxy";
 import { plans } from "@/util/types";
+import { getStoredCouponCode } from "@/app/serverAction/couponAction";
 
 export type CheckoutProduct = "money_tracker" | "habit_tracker" | "bundle";
 
@@ -17,6 +18,10 @@ export async function POST(req: NextRequest) {
     ) {
       return NextResponse.json({ error: "invalid_product" }, { status: 400 });
     }
+
+    // 1b. Pull any influencer coupon code captured from the landing-page URL.
+    //     (Discount application happens in a later step — for now we just read it.)
+    const couponCode = await getStoredCouponCode();
 
     // 2. Check if the user is logged in (optional — guests can still checkout)
     const jwtUser = await getUser();
@@ -70,12 +75,17 @@ export async function POST(req: NextRequest) {
 
     // 5. Build checkout URL — attach userId only for logged-in users
     const returnUrl = encodeURIComponent(process.env.NEXT_PUBLIC_DOMAIN!);
-    const checkoutUrl = dbUser
+    let checkoutUrl = dbUser
       ? baseUrl +
         `?checkout[email]=${encodeURIComponent(dbUser.email)}` +
         `&attributes[userId]=${encodeURIComponent(dbUser.id)}` +
         `&checkout[return_url]=${returnUrl}`
       : baseUrl + `?checkout[return_url]=${returnUrl}`;
+
+    // Carry the coupon code through to checkout so the referral isn't lost.
+    if (couponCode) {
+      checkoutUrl += `&attributes[couponCode]=${encodeURIComponent(couponCode)}`;
+    }
 
     return NextResponse.json({ success: true, url: checkoutUrl });
   } catch (error: any) {
