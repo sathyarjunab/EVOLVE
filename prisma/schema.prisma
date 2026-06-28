@@ -43,6 +43,11 @@ enum UserType {
   INFLUENCER
 }
 
+enum CouponCodeType {
+  FLAT
+  PERCENTAGE
+}
+
 // ═══════════════════════════════════════════════════════════════
 // USERS
 // Core identity only. No tracker-specific data here.
@@ -110,6 +115,7 @@ model InfluencerLink {
 
   influencerId String   @map("influencer_id")
   link         String   @unique @db.VarChar(500)
+  couponCodeType CouponCodeType 
 
   createdAt    DateTime @default(now()) @map("created_at")
   updatedAt    DateTime @updatedAt @map("updated_at")
