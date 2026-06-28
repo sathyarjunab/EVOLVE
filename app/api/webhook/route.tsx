@@ -192,6 +192,9 @@ export async function POST(req: Request) {
             email: customerEmail,
             password: hashedPassword,
             access: initialAccess,
+            userType: "USER",
+            influencerType: "",
+            influencerShare: 0.0,
           },
         });
 

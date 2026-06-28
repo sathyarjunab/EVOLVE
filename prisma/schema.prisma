@@ -26,9 +26,21 @@ enum TrackerType {
   money_tracker
 }
 
-enum accessType {
+enum AccessType {
   habit_tracker
   money_tracker
+}
+
+enum BudgetTransactionType {
+  income
+  expense
+  savings
+}
+
+enum UserType {
+  ADMIN
+  USER
+  INFLUENCER
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -47,6 +59,9 @@ model User {
   lastLogin  DateTime? @map("last_login")
   createdAt  DateTime @default(now()) @map("created_at")
   updatedAt  DateTime @updatedAt @map("updated_at")
+  userType   UserType @default(USER)
+  influencerType String @db.VarChar(255) @map("influencer_type")
+  influencerShare Decimal @db.Decimal(5,2) @map("influencer_share")
 
   // Relations
   habits             Habit[]
@@ -62,7 +77,47 @@ model User {
   PasswordResetTokens PasswordResetToken[]
   ShopifyWebhookLogs ShopifyWebhookLog[]
 
+  influencedUsers InfluencerUserMapping[] @relation("InfluencerMappings")
+  influencer      InfluencerUserMapping[] @relation("UserMappings")
+  referralLinks InfluencerLink[]
+
+
   @@map("users")
+}
+
+model InfluencerUserMapping {
+  id                  String   @id @default(uuid())
+
+  influencerId        String   @map("influencer_id")
+  userId              String   @map("user_id")
+
+  influencerEarnings  Decimal  @default(0) @db.Decimal(15,2) @map("influencer_earnings")
+
+  createdAt           DateTime @default(now()) @map("created_at")
+  updatedAt           DateTime @updatedAt @map("updated_at")
+
+  influencer User @relation("InfluencerMappings", fields: [influencerId], references: [id], onDelete: Cascade)
+  user        User @relation("UserMappings", fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([influencerId, userId])
+  @@index([influencerId])
+  @@index([userId])
+  @@map("influencer_user_mappings")
+}
+
+model InfluencerLink {
+  id           String   @id @default(uuid())
+
+  influencerId String   @map("influencer_id")
+  link         String   @unique @db.VarChar(500)
+
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  influencer   User @relation(fields: [influencerId], references: [id], onDelete: Cascade)
+
+  @@index([influencerId])
+  @@map("influencer_links")
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -176,11 +231,6 @@ model TrackerStats {
 // BUDGET TRACKER
 // ═══════════════════════════════════════════════════════════════
 
-enum BudgetTransactionType {
-  income
-  expense
-  savings
-}
 
 // One row per user. Currency preference, bank balance snapshot,
 // tutorial seen flag.

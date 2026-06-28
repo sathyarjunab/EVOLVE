@@ -31,7 +31,10 @@ export default async function signup(name: string, email: string, password: stri
                 name: data.name,
                 email: data.email,
                 password: hashedPassword,
-                timezone: data.timezone || "UTC"
+                timezone: data.timezone || "UTC",
+                userType: "USER",
+                influencerType: "",
+                influencerShare: 0.0,
             }
         })
 

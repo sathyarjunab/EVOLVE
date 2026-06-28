@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import getProfile from "./app/serverAction/getUser";
 import { toast } from "sonner";
+import { UserType } from "./app/generated/prisma/enums";
 
 export type Access = {
   habit_tracker: boolean;
@@ -26,6 +27,10 @@ export async function proxy(request: NextRequest) {
   // Redirect unauthenticated users
   if (!user) {
     return NextResponse.redirect(new URL(`/landing`, request.url));
+  }
+
+  if (pathname.startsWith("/admin") && user.userType === UserType.ADMIN) {
+    return NextResponse.next();
   }
 
   const access = user.access as Access;
