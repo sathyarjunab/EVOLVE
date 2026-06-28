@@ -14,7 +14,10 @@ const createCodeSchema = z.object({
   code: z
     .string()
     .max(100)
-    .regex(/^[A-Z0-9_-]+$/i, "Code may only contain letters, numbers, hyphens and underscores")
+    .regex(
+      /^[A-Z0-9_-]+$/i,
+      "Code may only contain letters, numbers, hyphens and underscores",
+    )
     .optional(),
   couponCodeType: z.enum(["FLAT", "PERCENTAGE"], {
     error: "Coupon type must be FLAT or PERCENTAGE",
@@ -29,7 +32,10 @@ const deleteCodeSchema = z.object({
 function generateCode(): string {
   const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
   const segment = (len: number) =>
-    Array.from({ length: len }, () => chars[Math.floor(Math.random() * chars.length)]).join("");
+    Array.from(
+      { length: len },
+      () => chars[Math.floor(Math.random() * chars.length)],
+    ).join("");
   return `${segment(4)}-${segment(4)}-${segment(4)}`;
 }
 
@@ -43,7 +49,8 @@ async function requireAdmin() {
     select: { userType: true },
   });
 
-  if (adminUser?.userType !== "ADMIN") return { error: "Forbidden", status: 403 as const };
+  if (adminUser?.userType !== "ADMIN")
+    return { error: "Forbidden", status: 403 as const };
   return { sessionUser };
 }
 
@@ -51,12 +58,16 @@ async function requireAdmin() {
 export async function GET(req: NextRequest) {
   try {
     const auth = await requireAdmin();
-    if ("error" in auth) return NextResponse.json({ error: auth.error }, { status: auth.status });
+    if ("error" in auth)
+      return NextResponse.json({ error: auth.error }, { status: auth.status });
 
     const influencerId = new URL(req.url).searchParams.get("influencerId");
     const parsed = getCodesSchema.safeParse({ influencerId });
     if (!parsed.success)
-      return NextResponse.json({ error: "Invalid influencer ID" }, { status: 400 });
+      return NextResponse.json(
+        { error: "Invalid influencer ID" },
+        { status: 400 },
+      );
 
     const codes = await prisma.influencerLink.findMany({
       where: { influencerId: parsed.data.influencerId },
@@ -65,7 +76,10 @@ export async function GET(req: NextRequest) {
 
     return NextResponse.json({ success: true, data: codes });
   } catch (e: any) {
-    return NextResponse.json({ error: e.message || "Internal Server Error" }, { status: 500 });
+    return NextResponse.json(
+      { error: e.message || "Internal Server Error" },
+      { status: 500 },
+    );
   }
 }
 
@@ -73,14 +87,18 @@ export async function GET(req: NextRequest) {
 export async function POST(req: NextRequest) {
   try {
     const auth = await requireAdmin();
-    if ("error" in auth) return NextResponse.json({ error: auth.error }, { status: auth.status });
+    if ("error" in auth)
+      return NextResponse.json({ error: auth.error }, { status: auth.status });
 
     const body = await req.json();
     const parsed = createCodeSchema.safeParse(body);
     if (!parsed.success) {
       return NextResponse.json(
-        { error: "Validation failed", details: parsed.error.flatten().fieldErrors },
-        { status: 400 }
+        {
+          error: "Validation failed",
+          details: parsed.error.flatten().fieldErrors,
+        },
+        { status: 400 },
       );
     }
 
@@ -91,9 +109,16 @@ export async function POST(req: NextRequest) {
       where: { id: influencerId },
       select: { userType: true },
     });
-    if (!influencer) return NextResponse.json({ error: "Influencer not found" }, { status: 404 });
+    if (!influencer)
+      return NextResponse.json(
+        { error: "Influencer not found" },
+        { status: 404 },
+      );
     if (influencer.userType !== "INFLUENCER")
-      return NextResponse.json({ error: "User is not an influencer" }, { status: 400 });
+      return NextResponse.json(
+        { error: "User is not an influencer" },
+        { status: 400 },
+      );
 
     // Resolve the code — use the provided one or auto-generate a unique one
     let code: string;
@@ -101,14 +126,16 @@ export async function POST(req: NextRequest) {
       code = parsed.data.code.trim().toUpperCase();
 
       // Uniqueness check for a user-supplied code
-      const existing = await prisma.influencerLink.findUnique({ where: { code } });
+      const existing = await prisma.influencerLink.findUnique({
+        where: { code },
+      });
       if (existing) {
         return NextResponse.json(
           {
             error: `Coupon code "${code}" is already in use. Please choose a different code.`,
             code: "DUPLICATE_CODE",
           },
-          { status: 409 }
+          { status: 409 },
         );
       }
     } else {
@@ -117,7 +144,9 @@ export async function POST(req: NextRequest) {
       let candidate: string | null = null;
       for (let attempt = 0; attempt < MAX_ATTEMPTS; attempt++) {
         const generated = generateCode();
-        const existing = await prisma.influencerLink.findUnique({ where: { code: generated } });
+        const existing = await prisma.influencerLink.findUnique({
+          where: { code: generated },
+        });
         if (!existing) {
           candidate = generated;
           break;
@@ -130,7 +159,7 @@ export async function POST(req: NextRequest) {
             error: "Could not generate a unique coupon code. Please try again.",
             code: "CODE_GENERATION_FAILED",
           },
-          { status: 409 }
+          { status: 409 },
         );
       }
 
@@ -143,7 +172,11 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({ success: true, data: newCode });
   } catch (e: any) {
-    return NextResponse.json({ error: e.message || "Internal Server Error" }, { status: 500 });
+    console.log(e);
+    return NextResponse.json(
+      { error: e.message || "Internal Server Error" },
+      { status: 500 },
+    );
   }
 }
 
@@ -151,19 +184,29 @@ export async function POST(req: NextRequest) {
 export async function DELETE(req: NextRequest) {
   try {
     const auth = await requireAdmin();
-    if ("error" in auth) return NextResponse.json({ error: auth.error }, { status: auth.status });
+    if ("error" in auth)
+      return NextResponse.json({ error: auth.error }, { status: auth.status });
 
     const id = new URL(req.url).searchParams.get("id");
     const parsed = deleteCodeSchema.safeParse({ id });
     if (!parsed.success)
       return NextResponse.json({ error: "Invalid coupon ID" }, { status: 400 });
 
-    const target = await prisma.influencerLink.findUnique({ where: { id: parsed.data.id } });
-    if (!target) return NextResponse.json({ error: "Coupon code not found" }, { status: 404 });
+    const target = await prisma.influencerLink.findUnique({
+      where: { id: parsed.data.id },
+    });
+    if (!target)
+      return NextResponse.json(
+        { error: "Coupon code not found" },
+        { status: 404 },
+      );
 
     await prisma.influencerLink.delete({ where: { id: parsed.data.id } });
     return NextResponse.json({ success: true, message: "Coupon code deleted" });
   } catch (e: any) {
-    return NextResponse.json({ error: e.message || "Internal Server Error" }, { status: 500 });
+    return NextResponse.json(
+      { error: e.message || "Internal Server Error" },
+      { status: 500 },
+    );
   }
 }
