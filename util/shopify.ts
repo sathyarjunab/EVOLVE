@@ -3,7 +3,7 @@
 // the app's Client ID/Secret for a short-lived (24h) Admin API token via the
 // client-credentials grant, cache it in memory, and use it for GraphQL calls.
 
-const STORE_DOMAIN = process.env.SHOPIFY_STORE_DOMAIN;
+const STORE_DOMAIN = process.env.SHOPIFY_DOMAIN;
 const CLIENT_ID = process.env.SHOPIFY_CLIENT_ID;
 const CLIENT_SECRET = process.env.SHOPIFY_CLIENT_SECRET;
 const API_VERSION = process.env.SHOPIFY_API_VERSION ?? "2025-04";
@@ -48,7 +48,10 @@ async function getAccessToken(): Promise<string> {
     throw new Error(`Shopify token exchange failed (${res.status}): ${text}`);
   }
 
-  const json = (await res.json()) as { access_token: string; expires_in: number };
+  const json = (await res.json()) as {
+    access_token: string;
+    expires_in: number;
+  };
   cachedToken = {
     value: json.access_token,
     expiresAt: Date.now() + json.expires_in * 1000,
@@ -86,10 +89,18 @@ async function adminGraphql<T>(
 // ─── Discount creation ───────────────────────────────────────────────────────
 
 const DISCOUNT_CODE_BASIC_CREATE = /* GraphQL */ `
-  mutation discountCodeBasicCreate($basicCodeDiscount: DiscountCodeBasicInput!) {
+  mutation discountCodeBasicCreate(
+    $basicCodeDiscount: DiscountCodeBasicInput!
+  ) {
     discountCodeBasicCreate(basicCodeDiscount: $basicCodeDiscount) {
-      codeDiscountNode { id }
-      userErrors { field code message }
+      codeDiscountNode {
+        id
+      }
+      userErrors {
+        field
+        code
+        message
+      }
     }
   }
 `;
@@ -98,7 +109,11 @@ interface DiscountCodeBasicCreateResponse {
   data?: {
     discountCodeBasicCreate: {
       codeDiscountNode: { id: string } | null;
-      userErrors: { field: string[] | null; code: string | null; message: string }[];
+      userErrors: {
+        field: string[] | null;
+        code: string | null;
+        message: string;
+      }[];
     };
   };
   errors?: { message: string }[];
