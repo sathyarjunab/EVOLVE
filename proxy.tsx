@@ -33,6 +33,13 @@ export async function proxy(request: NextRequest) {
     return NextResponse.next();
   }
 
+  if (
+    pathname.startsWith("/influencer") &&
+    user.userType === UserType.INFLUENCER
+  ) {
+    return NextResponse.next();
+  }
+
   const access = user.access as Access;
   // Decide target route
   let target = "/landing";
