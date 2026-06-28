@@ -29,16 +29,25 @@ export default function AdminSidebar({
   logout,
 }: AdminSidebarProps) {
   const navItems: { tab: TabType; label: string; icon: React.ReactNode }[] = [
-    { tab: "dashboard", label: "Dashboard", icon: <LayoutDashboard size={18} /> },
+    {
+      tab: "dashboard",
+      label: "Dashboard",
+      icon: <LayoutDashboard size={18} />,
+    },
     { tab: "users", label: "List Users", icon: <Users size={18} /> },
-    { tab: "influencers", label: "List Influencer", icon: <UserCheck size={18} /> },
-    { tab: "add_link", label: "Add Link", icon: <Link2 size={18} /> },
+    {
+      tab: "influencers",
+      label: "List Influencer",
+      icon: <UserCheck size={18} />,
+    },
   ];
 
   return (
     <aside
       className={`fixed md:sticky top-0 left-0 bottom-0 z-50 w-64 bg-s1 border-r border-border flex flex-col justify-between p-6 transform transition-transform duration-300 ease-in-out md:transform-none h-screen ${
-        isMobileSidebarOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"
+        isMobileSidebarOpen
+          ? "translate-x-0"
+          : "-translate-x-full md:translate-x-0"
       }`}
     >
       <div className="flex flex-col gap-8">
@@ -89,7 +98,9 @@ export default function AdminSidebar({
             {user.name ? user.name[0] : "A"}
           </div>
           <div className="flex-1 min-w-0">
-            <p className="text-xs font-semibold text-t1 truncate">{user.name || "Administrator"}</p>
+            <p className="text-xs font-semibold text-t1 truncate">
+              {user.name || "Administrator"}
+            </p>
             <p className="text-[10px] text-t2 truncate">{user.email}</p>
           </div>
         </div>
