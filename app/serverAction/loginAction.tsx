@@ -37,7 +37,7 @@ export default async function login(email: string, password: string) {
       data: { lastLogin: new Date() },
     });
 
-    const token = await getToken(user);
+    const token = await getToken(userWithoutPassword);
 
     (await cookies()).set("token", token, {
       httpOnly: true,
