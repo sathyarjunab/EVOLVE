@@ -95,21 +95,46 @@ export async function POST(req: NextRequest) {
     if (influencer.userType !== "INFLUENCER")
       return NextResponse.json({ error: "User is not an influencer" }, { status: 400 });
 
-    // Resolve the code — use provided one or auto-generate (with collision retry)
-    let code = parsed.data.code
-      ? parsed.data.code.trim().toUpperCase()
-      : generateCode();
+    // Resolve the code — use the provided one or auto-generate a unique one
+    let code: string;
+    if (parsed.data.code) {
+      code = parsed.data.code.trim().toUpperCase();
 
-    // Uniqueness check
-    const existing = await prisma.influencerLink.findUnique({ where: { code } });
-    if (existing) {
-      return NextResponse.json(
-        {
-          error: `Coupon code "${code}" is already in use. Please choose a different code.`,
-          code: "DUPLICATE_CODE",
-        },
-        { status: 409 }
-      );
+      // Uniqueness check for a user-supplied code
+      const existing = await prisma.influencerLink.findUnique({ where: { code } });
+      if (existing) {
+        return NextResponse.json(
+          {
+            error: `Coupon code "${code}" is already in use. Please choose a different code.`,
+            code: "DUPLICATE_CODE",
+          },
+          { status: 409 }
+        );
+      }
+    } else {
+      // Auto-generate — try up to 3 times to land on a code that doesn't collide
+      const MAX_ATTEMPTS = 3;
+      let candidate: string | null = null;
+      for (let attempt = 0; attempt < MAX_ATTEMPTS; attempt++) {
+        const generated = generateCode();
+        const existing = await prisma.influencerLink.findUnique({ where: { code: generated } });
+        if (!existing) {
+          candidate = generated;
+          break;
+        }
+      }
+
+      if (!candidate) {
+        return NextResponse.json(
+          {
+            error: "Could not generate a unique coupon code. Please try again.",
+            code: "CODE_GENERATION_FAILED",
+          },
+          { status: 409 }
+        );
+      }
+
+      code = candidate;
     }
 
     const newCode = await prisma.influencerLink.create({
