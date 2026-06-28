@@ -246,6 +246,39 @@ export async function POST(req: Request) {
       },
     });
 
+    // ── INFLUENCER ATTRIBUTION ───────────────────────────────────────────────
+    // If the order used an influencer coupon, record the influencer → buyer
+    // mapping. Codes are stored uppercase, so normalise before lookup. This must
+    // never block the order, so it runs in its own try/catch.
+    const couponCode = body.discount_codes?.[0]?.code?.trim().toUpperCase();
+    if (couponCode) {
+      try {
+        const link = await prisma.influencerLink.findUnique({
+          where: { code: couponCode },
+          select: { influencerId: true },
+        });
+
+        // Skip self-referrals (an influencer buying with their own code).
+        if (link && link.influencerId !== user.id) {
+          await prisma.influencerUserMapping.upsert({
+            where: {
+              influencerId_userId: {
+                influencerId: link.influencerId,
+                userId: user.id,
+              },
+            },
+            create: {
+              influencerId: link.influencerId,
+              userId: user.id,
+            },
+            update: {},
+          });
+        }
+      } catch (mapErr) {
+        console.error("Failed to record influencer mapping:", mapErr);
+      }
+    }
+
     console.log("USER UPDATED");
     logSuccess = true;
     return Response.json({ success: true });

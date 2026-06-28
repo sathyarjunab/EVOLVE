@@ -35,6 +35,13 @@ export interface ShopifyOrdersPaidWebhook {
     quantity: number;
   }[];
 
+  // Discount codes applied to the order, e.g. an influencer coupon.
+  discount_codes: {
+    code: string;
+    amount: string;
+    type: string;
+  }[];
+
   note_attributes: {
     name: string;
     value: string;

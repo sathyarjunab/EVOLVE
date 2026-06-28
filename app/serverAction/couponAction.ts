@@ -4,7 +4,9 @@ import { cookies } from "next/headers";
 
 // Cookie that carries an influencer coupon code from the landing-page URL
 // through to checkout. Lives 30 days so a referral survives a browse session.
-export const COUPON_COOKIE = "coupon_code";
+// NOTE: a "use server" file may ONLY export async functions. Keep this constant
+// un-exported, otherwise Next.js turns it into a server-action reference.
+const COUPON_COOKIE = "coupon_code";
 const COUPON_MAX_AGE = 60 * 60 * 24 * 30; // 30 days
 const COUPON_REGEX = /^[A-Z0-9_-]+$/i;
 
