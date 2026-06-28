@@ -246,18 +246,24 @@ export async function POST(req: Request) {
       },
     });
 
-    // ── INFLUENCER ATTRIBUTION ───────────────────────────────────────────────
-    // If the order used an influencer coupon, record the influencer → buyer
-    // mapping. Codes are stored uppercase, so normalise before lookup. This must
-    // never block the order, so it runs in its own try/catch.
-    const couponCode = body.discount_codes?.[0]?.code?.trim().toUpperCase();
-    if (couponCode) {
-      try {
+    // ── INFLUENCER ATTRIBUTION + EARNINGS ────────────────────────────────────
+    // Decide which influencer (if any) this purchase is attributed to, then
+    // accrue their share of the order onto the mapping's stored earnings.
+    //  • A coupon on this order creates/links the mapping to that influencer.
+    //  • With no coupon, an already-referred buyer still earns their influencer
+    //    a share (earnings count on ALL purchases by a referred user).
+    // The transaction idempotency check above means each paid order reaches this
+    // block at most once, so earnings are never double-counted on retries.
+    // Wrapped in its own try/catch so attribution never blocks the order.
+    try {
+      const couponCode = body.discount_codes?.[0]?.code?.trim().toUpperCase();
+      let attributedInfluencerId: string | null = null;
+
+      if (couponCode) {
         const link = await prisma.influencerLink.findUnique({
           where: { code: couponCode },
           select: { influencerId: true },
         });
-
         // Skip self-referrals (an influencer buying with their own code).
         if (link && link.influencerId !== user.id) {
           await prisma.influencerUserMapping.upsert({
@@ -267,16 +273,45 @@ export async function POST(req: Request) {
                 userId: user.id,
               },
             },
-            create: {
-              influencerId: link.influencerId,
-              userId: user.id,
-            },
+            create: { influencerId: link.influencerId, userId: user.id },
             update: {},
           });
+          attributedInfluencerId = link.influencerId;
         }
-      } catch (mapErr) {
-        console.error("Failed to record influencer mapping:", mapErr);
       }
+
+      // No coupon on this order — fall back to the buyer's existing influencer.
+      if (!attributedInfluencerId) {
+        const existing = await prisma.influencerUserMapping.findFirst({
+          where: { userId: user.id },
+          select: { influencerId: true },
+        });
+        attributedInfluencerId = existing?.influencerId ?? null;
+      }
+
+      // Accrue the influencer's percentage share of this order's total.
+      if (attributedInfluencerId && attributedInfluencerId !== user.id) {
+        const influencer = await prisma.user.findUnique({
+          where: { id: attributedInfluencerId },
+          select: { influencerShare: true },
+        });
+        const sharePct = Number(influencer?.influencerShare ?? 0);
+        const earnings = (Number(totalPrice) * sharePct) / 100;
+
+        if (earnings > 0) {
+          await prisma.influencerUserMapping.update({
+            where: {
+              influencerId_userId: {
+                influencerId: attributedInfluencerId,
+                userId: user.id,
+              },
+            },
+            data: { influencerEarnings: { increment: earnings } },
+          });
+        }
+      }
+    } catch (mapErr) {
+      console.error("Failed to record influencer attribution/earnings:", mapErr);
     }
 
     console.log("USER UPDATED");
