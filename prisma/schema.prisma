@@ -118,6 +118,10 @@ model InfluencerLink {
   couponCodeType CouponCodeType @map("coupon_code_type")
   discountValue  Decimal        @db.Decimal(10, 2) @map("discount_value")
 
+  // Shopify price-rule/discount node id (gid). Set lazily the first time the
+  // code is used at checkout so we create the Shopify discount only once.
+  shopifyDiscountId String?     @map("shopify_discount_id")
+
   createdAt      DateTime       @default(now()) @map("created_at")
   updatedAt      DateTime       @updatedAt @map("updated_at")
 

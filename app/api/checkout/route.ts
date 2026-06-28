@@ -4,8 +4,52 @@ import { prisma } from "@/prisma/prisma";
 import { Access } from "@/proxy";
 import { plans } from "@/util/types";
 import { getStoredCouponCode } from "@/app/serverAction/couponAction";
+import { createBasicDiscountCode, isShopifyConfigured } from "@/util/shopify";
 
 export type CheckoutProduct = "money_tracker" | "habit_tracker" | "bundle";
+
+/**
+ * Turn a stored coupon code into a Shopify discount code that can be applied via
+ * the cart-permalink `?discount=` parameter.
+ *
+ * Creates the Shopify discount lazily on first use and caches its id on the
+ * InfluencerLink so subsequent checkouts reuse it (Shopify codes are unique, so
+ * we must not recreate them). Returns the code to apply, or null to skip.
+ */
+async function resolveDiscountCode(couponCode: string | null): Promise<string | null> {
+  if (!couponCode || !isShopifyConfigured()) return null;
+
+  try {
+    const link = await prisma.influencerLink.findUnique({
+      where: { code: couponCode },
+    });
+    if (!link) return null;
+
+    // Already created in Shopify — just reuse the code.
+    if (link.shopifyDiscountId) return link.code;
+
+    const { discountId, errors } = await createBasicDiscountCode({
+      code: link.code,
+      couponCodeType: link.couponCodeType,
+      discountValue: Number(link.discountValue),
+    });
+
+    if (!discountId) {
+      console.error("Shopify discount creation failed:", errors);
+      return null;
+    }
+
+    await prisma.influencerLink.update({
+      where: { id: link.id },
+      data: { shopifyDiscountId: discountId },
+    });
+
+    return link.code;
+  } catch (err) {
+    console.error("resolveDiscountCode error:", err);
+    return null;
+  }
+}
 
 export async function POST(req: NextRequest) {
   try {
@@ -20,7 +64,6 @@ export async function POST(req: NextRequest) {
     }
 
     // 1b. Pull any influencer coupon code captured from the landing-page URL.
-    //     (Discount application happens in a later step — for now we just read it.)
     const couponCode = await getStoredCouponCode();
 
     // 2. Check if the user is logged in (optional — guests can still checkout)
@@ -82,9 +125,12 @@ export async function POST(req: NextRequest) {
         `&checkout[return_url]=${returnUrl}`
       : baseUrl + `?checkout[return_url]=${returnUrl}`;
 
-    // Carry the coupon code through to checkout so the referral isn't lost.
-    if (couponCode) {
-      checkoutUrl += `&attributes[couponCode]=${encodeURIComponent(couponCode)}`;
+    // 6. Resolve the influencer coupon into a Shopify discount and auto-apply it.
+    //    Failures here must NEVER block the sale — we just fall back to a normal
+    //    checkout without a discount.
+    const appliedCode = await resolveDiscountCode(couponCode);
+    if (appliedCode) {
+      checkoutUrl += `&discount=${encodeURIComponent(appliedCode)}`;
     }
 
     return NextResponse.json({ success: true, url: checkoutUrl });
