@@ -6,8 +6,12 @@ import { getUser } from "@/util/serverAuthHelper";
 import { cookies } from "next/headers";
 import { UserModel } from "../generated/prisma/models";
 
-export type passwordlessUser = Omit<UserModel, "password"> & {
+export type passwordlessUser = Omit<
+  UserModel,
+  "password" | "influencerShare"
+> & {
   password?: string;
+  influencerShare: number;
 };
 
 type GetProfileReturnType =
@@ -28,7 +32,7 @@ export default async function getProfile(): Promise<GetProfileReturnType> {
       throw new AppError("User not found", 404);
     }
 
-    const profile: passwordlessUser | null = await prisma.user.findUnique({
+    const profile = await prisma.user.findUnique({
       where: {
         id: user.id,
       },
@@ -37,8 +41,15 @@ export default async function getProfile(): Promise<GetProfileReturnType> {
     if (!profile) {
       throw new AppError("User not found", 404);
     }
-    delete profile.password;
-    return { success: true, data: profile };
+
+    const { password, ...rest } = profile;
+    return {
+      success: true,
+      data: {
+        ...rest,
+        influencerShare: Number(profile.influencerShare),
+      },
+    };
   } catch (err) {
     if (err instanceof AppError) {
       return {

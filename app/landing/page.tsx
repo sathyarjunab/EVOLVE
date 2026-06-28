@@ -3,7 +3,7 @@
 import { Loader2 } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Script from "next/script";
-import { Suspense, useEffect, useState } from "react";
+import { Suspense, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { useAuth } from "../AuthContextProvider";
 import getProfile, { passwordlessUser } from "../serverAction/getUser";
@@ -20,12 +20,19 @@ function LandingContent() {
 
   // Capture an influencer coupon code from the URL (?coupon=CODE) and persist
   // it to a cookie so it survives until the user reaches checkout.
+  //
+  // `storeCouponCode` is a Server Action; invoking it triggers a router refresh,
+  // which yields a new `searchParams` object. Depending on the coupon *string*
+  // (stable across refreshes) plus a ref that tracks the last-stored code keeps
+  // this from looping and re-writing the cookie on every refresh.
+  const coupon = searchParams.get("coupon");
+  const storedCouponRef = useRef<string | null>(null);
   useEffect(() => {
-    const coupon = searchParams.get("coupon");
-    if (coupon) {
+    if (coupon && storedCouponRef.current !== coupon) {
+      storedCouponRef.current = coupon;
       storeCouponCode(coupon);
     }
-  }, [searchParams]);
+  }, [coupon]);
 
   const [profile, setProfile] = useState<passwordlessUser | null>(null);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
