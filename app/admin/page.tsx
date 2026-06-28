@@ -10,7 +10,6 @@ import AdminSidebar from "./components/AdminSidebar";
 import DashboardView from "./components/DashboardView";
 import ListUsersView from "./components/ListUsersView";
 import EditUserModal from "./components/EditUserModal";
-import InfluencersView from "./components/InfluencersView";
 import AddLinkView from "./components/AddLinkView";
 
 export default function AdminPage() {
@@ -30,6 +29,13 @@ export default function AdminPage() {
   const [totalPages, setTotalPages] = useState(1);
   const [totalCount, setTotalCount] = useState(0);
   const [fetching, setFetching] = useState(false);
+
+  const handleTabChange = (tab: TabType) => {
+    setActiveTab(tab);
+    setSearch("");
+    setDebouncedSearch("");
+    setPage(1);
+  };
 
   // Edit modal state
   const [editingUser, setEditingUser] = useState<UserRecord | null>(null);
@@ -52,6 +58,9 @@ export default function AdminPage() {
         limit: limit.toString(),
         search: debouncedSearch,
       });
+      if (activeTab === "influencers") {
+        query.set("type", "INFLUENCER");
+      }
       const res = await fetch(`/api/admin/users?${query.toString()}`);
       const json = await res.json();
       if (res.ok && json.success) {
@@ -70,7 +79,7 @@ export default function AdminPage() {
     if (user && user.userType === "ADMIN") {
       fetchUsers();
     }
-  }, [page, debouncedSearch, user]);
+  }, [page, debouncedSearch, user, activeTab]);
 
   // Auth redirect
   useEffect(() => {
@@ -152,7 +161,7 @@ export default function AdminPage() {
       {/* Sidebar */}
       <AdminSidebar
         activeTab={activeTab}
-        setActiveTab={setActiveTab}
+        setActiveTab={handleTabChange}
         isMobileSidebarOpen={isMobileSidebarOpen}
         setIsMobileSidebarOpen={setIsMobileSidebarOpen}
         user={user}
@@ -188,7 +197,23 @@ export default function AdminPage() {
           />
         )}
 
-        {activeTab === "influencers" && <InfluencersView />}
+        {activeTab === "influencers" && (
+          <ListUsersView
+            users={users}
+            search={search}
+            setSearch={setSearch}
+            debouncedSearch={debouncedSearch}
+            page={page}
+            setPage={setPage}
+            limit={limit}
+            totalPages={totalPages}
+            totalCount={totalCount}
+            fetching={fetching}
+            fetchUsers={fetchUsers}
+            onEditUser={setEditingUser}
+            filterType="INFLUENCER"
+          />
+        )}
 
         {activeTab === "add_link" && <AddLinkView />}
       </main>

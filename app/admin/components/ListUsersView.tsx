@@ -24,6 +24,7 @@ interface ListUsersViewProps {
   fetching: boolean;
   fetchUsers: () => void;
   onEditUser: (user: UserRecord) => void;
+  filterType?: "USER" | "INFLUENCER" | "ADMIN" | "ALL";
 }
 
 export default function ListUsersView({
@@ -39,6 +40,7 @@ export default function ListUsersView({
   fetching,
   fetchUsers,
   onEditUser,
+  filterType = "ALL",
 }: ListUsersViewProps) {
   return (
     <div className="flex flex-col gap-6 animate-fadeIn">
@@ -46,10 +48,12 @@ export default function ListUsersView({
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <h1 className="text-3xl font-extrabold tracking-tight font-outfit text-t1">
-            User Directory
+            {filterType === "INFLUENCER" ? "Influencer Directory" : "User Directory"}
           </h1>
           <p className="text-sm text-t2 mt-1">
-            Manage user accounts, check tracker permissions, and verify engagement metrics.
+            {filterType === "INFLUENCER"
+              ? "Manage influencer accounts, verify custom platform categories, and adjust referral rates."
+              : "Manage user accounts, check tracker permissions, and verify engagement metrics."}
           </p>
         </div>
         <button
@@ -91,7 +95,8 @@ export default function ListUsersView({
             </span>
           )}
           <span className="bg-s2 border border-border/80 px-3 py-1.5 rounded-lg">
-            Total Users: <strong className="text-t1">{totalCount}</strong>
+            {filterType === "INFLUENCER" ? "Total Influencers: " : "Total Users: "}
+            <strong className="text-t1">{totalCount}</strong>
           </span>
         </div>
       </div>
@@ -102,9 +107,18 @@ export default function ListUsersView({
           <table className="w-full text-left border-collapse">
             <thead>
               <tr className="border-b border-border bg-s2/40 text-t2 text-xs font-bold tracking-wider uppercase">
-                <th className="px-6 py-4">User Details</th>
-                <th className="px-6 py-4">Security Level</th>
-                <th className="px-6 py-4 text-center">Module Access</th>
+                <th className="px-6 py-4">{filterType === "INFLUENCER" ? "Influencer Details" : "User Details"}</th>
+                {filterType === "INFLUENCER" ? (
+                  <>
+                    <th className="px-6 py-4">Platform</th>
+                    <th className="px-6 py-4 text-center">Share Rate</th>
+                  </>
+                ) : (
+                  <>
+                    <th className="px-6 py-4">Security Level</th>
+                    <th className="px-6 py-4 text-center">Module Access</th>
+                  </>
+                )}
                 <th className="px-6 py-4">Registration</th>
                 <th className="px-6 py-4">Last Connection</th>
                 <th className="px-6 py-4 text-right">Actions</th>
@@ -142,9 +156,13 @@ export default function ListUsersView({
                       <div className="w-12 h-12 bg-s2 border border-border/80 rounded-full flex items-center justify-center text-t3">
                         <Search size={22} />
                       </div>
-                      <h3 className="text-base font-bold font-outfit text-t1">No Users Located</h3>
+                      <h3 className="text-base font-bold font-outfit text-t1">
+                        {filterType === "INFLUENCER" ? "No Influencers Located" : "No Users Located"}
+                      </h3>
                       <p className="text-xs text-t2 max-w-sm leading-relaxed">
-                        We could not find any accounts corresponding to that keyword query. Check spelling or clear filters to reset.
+                        {filterType === "INFLUENCER"
+                          ? "We could not find any influencers corresponding to that keyword query. Check spelling or clear filters to reset."
+                          : "We could not find any accounts corresponding to that keyword query. Check spelling or clear filters to reset."}
                       </p>
                       {search && (
                         <button
@@ -173,37 +191,54 @@ export default function ListUsersView({
                           </div>
                         </div>
                       </td>
-                      <td className="px-6 py-4">
-                        {item.userType === "ADMIN" ? (
-                          <span className="inline-flex items-center text-[10px] font-extrabold tracking-wider bg-lime/10 text-lime border border-lime/30 px-2 py-0.5 rounded-md uppercase font-mono">Admin</span>
-                        ) : item.userType === "INFLUENCER" ? (
-                          <span className="inline-flex items-center text-[10px] font-extrabold tracking-wider bg-purple/10 text-purple border border-purple/30 px-2 py-0.5 rounded-md uppercase font-mono">Influencer</span>
-                        ) : (
-                          <span className="inline-flex items-center text-[10px] font-bold tracking-wider bg-s2 text-t2 border border-border px-2 py-0.5 rounded-md uppercase font-mono">User</span>
-                        )}
-                      </td>
-                      <td className="px-6 py-4">
-                        <div className="flex items-center justify-center gap-2">
-                          <span
-                            className={`inline-flex items-center gap-1.5 text-[10px] font-semibold px-2 py-0.5 rounded border transition-colors ${
-                              acc.habit_tracker ? "bg-grn/10 text-grn border-grn/20" : "bg-s2 text-t3 border-border/40"
-                            }`}
-                            title={acc.habit_tracker ? "Habit Tracker Active" : "Habit Tracker Disabled"}
-                          >
-                            {acc.habit_tracker ? <CheckCircle2 size={10} /> : <XCircle size={10} />}
-                            <span>Habit</span>
-                          </span>
-                          <span
-                            className={`inline-flex items-center gap-1.5 text-[10px] font-semibold px-2 py-0.5 rounded border transition-colors ${
-                              acc.money_tracker ? "bg-grn/10 text-grn border-grn/20" : "bg-s2 text-t3 border-border/40"
-                            }`}
-                            title={acc.money_tracker ? "Money Tracker Active" : "Money Tracker Disabled"}
-                          >
-                            {acc.money_tracker ? <CheckCircle2 size={10} /> : <XCircle size={10} />}
-                            <span>Money</span>
-                          </span>
-                        </div>
-                      </td>
+                      {filterType === "INFLUENCER" ? (
+                        <>
+                          <td className="px-6 py-4">
+                            <span className="inline-flex items-center text-[10px] font-extrabold tracking-wider bg-purple/10 text-purple border border-purple/30 px-2.5 py-0.5 rounded-md uppercase font-mono">
+                              {item.influencerType || "Other"}
+                            </span>
+                          </td>
+                          <td className="px-6 py-4 text-center">
+                            <span className="text-xs font-bold text-t1 font-mono">
+                              {item.influencerShare ? `${Number(item.influencerShare)}%` : "0%"}
+                            </span>
+                          </td>
+                        </>
+                      ) : (
+                        <>
+                          <td className="px-6 py-4">
+                            {item.userType === "ADMIN" ? (
+                              <span className="inline-flex items-center text-[10px] font-extrabold tracking-wider bg-lime/10 text-lime border border-lime/30 px-2 py-0.5 rounded-md uppercase font-mono">Admin</span>
+                            ) : item.userType === "INFLUENCER" ? (
+                              <span className="inline-flex items-center text-[10px] font-extrabold tracking-wider bg-purple/10 text-purple border border-purple/30 px-2 py-0.5 rounded-md uppercase font-mono">Influencer</span>
+                            ) : (
+                              <span className="inline-flex items-center text-[10px] font-bold tracking-wider bg-s2 text-t2 border border-border px-2 py-0.5 rounded-md uppercase font-mono">User</span>
+                            )}
+                          </td>
+                          <td className="px-6 py-4">
+                            <div className="flex items-center justify-center gap-2">
+                              <span
+                                className={`inline-flex items-center gap-1.5 text-[10px] font-semibold px-2 py-0.5 rounded border transition-colors ${
+                                  acc.habit_tracker ? "bg-grn/10 text-grn border-grn/20" : "bg-s2 text-t3 border-border/40"
+                                }`}
+                                title={acc.habit_tracker ? "Habit Tracker Active" : "Habit Tracker Disabled"}
+                              >
+                                {acc.habit_tracker ? <CheckCircle2 size={10} /> : <XCircle size={10} />}
+                                <span>Habit</span>
+                              </span>
+                              <span
+                                className={`inline-flex items-center gap-1.5 text-[10px] font-semibold px-2 py-0.5 rounded border transition-colors ${
+                                  acc.money_tracker ? "bg-grn/10 text-grn border-grn/20" : "bg-s2 text-t3 border-border/40"
+                                }`}
+                                title={acc.money_tracker ? "Money Tracker Active" : "Money Tracker Disabled"}
+                              >
+                                {acc.money_tracker ? <CheckCircle2 size={10} /> : <XCircle size={10} />}
+                                <span>Money</span>
+                              </span>
+                            </div>
+                          </td>
+                        </>
+                      )}
                       <td className="px-6 py-4 text-xs text-t2 font-medium">{formatDate(item.createdAt)}</td>
                       <td className="px-6 py-4 text-xs text-t2 font-medium">
                         {item.lastLogin ? formatDate(item.lastLogin) : <span className="text-t3 font-normal italic">Never</span>}
@@ -213,7 +248,7 @@ export default function ListUsersView({
                           onClick={() => onEditUser(item)}
                           className="px-3 py-1.5 bg-s2 hover:bg-s3 text-t2 hover:text-t1 border border-border/60 hover:border-border transition duration-200 rounded-lg text-xs font-semibold"
                         >
-                          Edit User
+                          {filterType === "INFLUENCER" ? "Edit Influencer" : "Edit User"}
                         </button>
                       </td>
                     </tr>
@@ -230,7 +265,7 @@ export default function ListUsersView({
             <div className="text-xs text-t2 font-medium">
               Showing <span className="text-t1">{(page - 1) * limit + 1}</span> to{" "}
               <span className="text-t1">{Math.min(page * limit, totalCount)}</span> of{" "}
-              <span className="text-t1">{totalCount}</span> user profiles
+              <span className="text-t1">{totalCount}</span> {filterType === "INFLUENCER" ? "influencer" : "user"} profiles
             </div>
             <div className="flex items-center gap-1.5">
               <button
