@@ -3,85 +3,80 @@ import { getUser } from "@/util/serverAuthHelper";
 import { prisma } from "@/prisma/prisma";
 import { z } from "zod";
 
-const getLinksSchema = z.object({
+// ─── Zod schemas ────────────────────────────────────────────────
+const getCodesSchema = z.object({
   influencerId: z.string().uuid(),
 });
 
-const createLinkSchema = z.object({
+const createCodeSchema = z.object({
   influencerId: z.string().uuid(),
-  link: z.url().max(500),
+  // code is optional — if omitted, we auto-generate one
+  code: z
+    .string()
+    .max(100)
+    .regex(/^[A-Z0-9_-]+$/i, "Code may only contain letters, numbers, hyphens and underscores")
+    .optional(),
+  couponCodeType: z.enum(["FLAT", "PERCENTAGE"], {
+    error: "Coupon type must be FLAT or PERCENTAGE",
+  }),
 });
 
-const deleteLinkSchema = z.object({
+const deleteCodeSchema = z.object({
   id: z.string().uuid(),
 });
 
-// Helper to check admin access
-async function checkAdminAccess(): Promise<
-  { error: string; status: number; sessionUser?: undefined } |
-  { sessionUser: NonNullable<Awaited<ReturnType<typeof getUser>>>; error?: undefined; status?: undefined }
-> {
+// ─── Auto-generate a coupon code ─────────────────────────────────
+function generateCode(): string {
+  const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+  const segment = (len: number) =>
+    Array.from({ length: len }, () => chars[Math.floor(Math.random() * chars.length)]).join("");
+  return `${segment(4)}-${segment(4)}-${segment(4)}`;
+}
+
+// ─── Admin guard ─────────────────────────────────────────────────
+async function requireAdmin() {
   const sessionUser = await getUser();
-  if (!sessionUser || !sessionUser.id) {
-    return { error: "Unauthorized", status: 401 };
-  }
+  if (!sessionUser?.id) return { error: "Unauthorized", status: 401 as const };
 
   const adminUser = await prisma.user.findUnique({
     where: { id: sessionUser.id },
     select: { userType: true },
   });
 
-  if (!adminUser || adminUser.userType !== "ADMIN") {
-    return { error: "Forbidden", status: 403 };
-  }
-
+  if (adminUser?.userType !== "ADMIN") return { error: "Forbidden", status: 403 as const };
   return { sessionUser };
 }
 
+// ─── GET /api/admin/influencer-links ─────────────────────────────
 export async function GET(req: NextRequest) {
   try {
-    const auth = await checkAdminAccess();
-    if (auth.error) {
-      return NextResponse.json({ error: auth.error }, { status: auth.status });
-    }
+    const auth = await requireAdmin();
+    if ("error" in auth) return NextResponse.json({ error: auth.error }, { status: auth.status });
 
-    const { searchParams } = new URL(req.url);
-    const influencerId = searchParams.get("influencerId");
+    const influencerId = new URL(req.url).searchParams.get("influencerId");
+    const parsed = getCodesSchema.safeParse({ influencerId });
+    if (!parsed.success)
+      return NextResponse.json({ error: "Invalid influencer ID" }, { status: 400 });
 
-    const parsed = getLinksSchema.safeParse({ influencerId });
-    if (!parsed.success) {
-      return NextResponse.json(
-        { error: "Invalid influencer ID" },
-        { status: 400 }
-      );
-    }
-
-    const links = await prisma.influencerLink.findMany({
+    const codes = await prisma.influencerLink.findMany({
       where: { influencerId: parsed.data.influencerId },
       orderBy: { createdAt: "desc" },
     });
 
-    return NextResponse.json({
-      success: true,
-      data: links,
-    });
-  } catch (error: any) {
-    return NextResponse.json(
-      { error: error.message || "Internal Server Error" },
-      { status: 500 }
-    );
+    return NextResponse.json({ success: true, data: codes });
+  } catch (e: any) {
+    return NextResponse.json({ error: e.message || "Internal Server Error" }, { status: 500 });
   }
 }
 
+// ─── POST /api/admin/influencer-links ────────────────────────────
 export async function POST(req: NextRequest) {
   try {
-    const auth = await checkAdminAccess();
-    if (auth.error) {
-      return NextResponse.json({ error: auth.error }, { status: auth.status });
-    }
+    const auth = await requireAdmin();
+    if ("error" in auth) return NextResponse.json({ error: auth.error }, { status: auth.status });
 
     const body = await req.json();
-    const parsed = createLinkSchema.safeParse(body);
+    const parsed = createCodeSchema.safeParse(body);
     if (!parsed.success) {
       return NextResponse.json(
         { error: "Validation failed", details: parsed.error.flatten().fieldErrors },
@@ -89,88 +84,61 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const { influencerId, link } = parsed.data;
+    const { influencerId, couponCodeType } = parsed.data;
 
-    // Verify the influencer exists and has INFLUENCER role
+    // Verify influencer exists
     const influencer = await prisma.user.findUnique({
       where: { id: influencerId },
       select: { userType: true },
     });
-
-    if (!influencer) {
-      return NextResponse.json({ error: "Influencer not found" }, { status: 404 });
-    }
-
-    if (influencer.userType !== "INFLUENCER") {
+    if (!influencer) return NextResponse.json({ error: "Influencer not found" }, { status: 404 });
+    if (influencer.userType !== "INFLUENCER")
       return NextResponse.json({ error: "User is not an influencer" }, { status: 400 });
-    }
 
-    // Check link uniqueness
-    const existing = await prisma.influencerLink.findUnique({
-      where: { link },
-    });
+    // Resolve the code — use provided one or auto-generate (with collision retry)
+    let code = parsed.data.code
+      ? parsed.data.code.trim().toUpperCase()
+      : generateCode();
 
+    // Uniqueness check
+    const existing = await prisma.influencerLink.findUnique({ where: { code } });
     if (existing) {
       return NextResponse.json(
-        { error: "This referral link is already assigned to an influencer" },
-        { status: 400 }
+        {
+          error: `Coupon code "${code}" is already in use. Please choose a different code.`,
+          code: "DUPLICATE_CODE",
+        },
+        { status: 409 }
       );
     }
 
-    const newLink = await prisma.influencerLink.create({
-      data: { influencerId, link },
+    const newCode = await prisma.influencerLink.create({
+      data: { influencerId, code, couponCodeType },
     });
 
-    return NextResponse.json({
-      success: true,
-      data: newLink,
-    });
-  } catch (error: any) {
-    return NextResponse.json(
-      { error: error.message || "Internal Server Error" },
-      { status: 500 }
-    );
+    return NextResponse.json({ success: true, data: newCode });
+  } catch (e: any) {
+    return NextResponse.json({ error: e.message || "Internal Server Error" }, { status: 500 });
   }
 }
 
+// ─── DELETE /api/admin/influencer-links?id=... ───────────────────
 export async function DELETE(req: NextRequest) {
   try {
-    const auth = await checkAdminAccess();
-    if (auth.error) {
-      return NextResponse.json({ error: auth.error }, { status: auth.status });
-    }
+    const auth = await requireAdmin();
+    if ("error" in auth) return NextResponse.json({ error: auth.error }, { status: auth.status });
 
-    const { searchParams } = new URL(req.url);
-    const id = searchParams.get("id");
+    const id = new URL(req.url).searchParams.get("id");
+    const parsed = deleteCodeSchema.safeParse({ id });
+    if (!parsed.success)
+      return NextResponse.json({ error: "Invalid coupon ID" }, { status: 400 });
 
-    const parsed = deleteLinkSchema.safeParse({ id });
-    if (!parsed.success) {
-      return NextResponse.json(
-        { error: "Invalid link ID" },
-        { status: 400 }
-      );
-    }
+    const target = await prisma.influencerLink.findUnique({ where: { id: parsed.data.id } });
+    if (!target) return NextResponse.json({ error: "Coupon code not found" }, { status: 404 });
 
-    const targetLink = await prisma.influencerLink.findUnique({
-      where: { id: parsed.data.id },
-    });
-
-    if (!targetLink) {
-      return NextResponse.json({ error: "Link not found" }, { status: 404 });
-    }
-
-    await prisma.influencerLink.delete({
-      where: { id: parsed.data.id },
-    });
-
-    return NextResponse.json({
-      success: true,
-      message: "Link deleted successfully",
-    });
-  } catch (error: any) {
-    return NextResponse.json(
-      { error: error.message || "Internal Server Error" },
-      { status: 500 }
-    );
+    await prisma.influencerLink.delete({ where: { id: parsed.data.id } });
+    return NextResponse.json({ success: true, message: "Coupon code deleted" });
+  } catch (e: any) {
+    return NextResponse.json({ error: e.message || "Internal Server Error" }, { status: 500 });
   }
 }

@@ -111,16 +111,16 @@ model InfluencerUserMapping {
 }
 
 model InfluencerLink {
-  id           String   @id @default(uuid())
+  id             String         @id @default(uuid())
 
-  influencerId String   @map("influencer_id")
-  link         String   @unique @db.VarChar(500)
-  couponCodeType CouponCodeType 
+  influencerId   String         @map("influencer_id")
+  code           String         @unique @db.VarChar(100) @map("code")
+  couponCodeType CouponCodeType @map("coupon_code_type")
 
-  createdAt    DateTime @default(now()) @map("created_at")
-  updatedAt    DateTime @updatedAt @map("updated_at")
+  createdAt      DateTime       @default(now()) @map("created_at")
+  updatedAt      DateTime       @updatedAt @map("updated_at")
 
-  influencer   User @relation(fields: [influencerId], references: [id], onDelete: Cascade)
+  influencer     User @relation(fields: [influencerId], references: [id], onDelete: Cascade)
 
   @@index([influencerId])
   @@map("influencer_links")

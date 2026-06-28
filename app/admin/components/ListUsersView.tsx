@@ -251,7 +251,7 @@ export default function ListUsersView({
                             onClick={() => onViewLinks?.(item)}
                             className="px-3 py-1.5 bg-s2 hover:bg-s3 text-lime/80 hover:text-lime border border-border/60 hover:border-lime/30 transition duration-200 rounded-lg text-xs font-semibold"
                           >
-                            View Links
+                            View Coupons
                           </button>
                         ) : (
                           <button
