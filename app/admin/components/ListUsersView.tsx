@@ -8,6 +8,7 @@ import {
   ChevronRight,
   CheckCircle2,
   XCircle,
+  Trash2,
 } from "lucide-react";
 import { UserRecord, formatDate, getAccessDetails } from "./types";
 
@@ -25,6 +26,7 @@ interface ListUsersViewProps {
   fetchUsers: () => void;
   onEditUser?: (user: UserRecord) => void;
   onViewLinks?: (user: UserRecord) => void;
+  onDeleteUser?: (user: UserRecord) => void;
   filterType?: "USER" | "INFLUENCER" | "ADMIN" | "ALL";
 }
 
@@ -42,6 +44,7 @@ export default function ListUsersView({
   fetchUsers,
   onEditUser,
   onViewLinks,
+  onDeleteUser,
   filterType = "ALL",
 }: ListUsersViewProps) {
   return (
@@ -246,21 +249,33 @@ export default function ListUsersView({
                         {item.lastLogin ? formatDate(item.lastLogin) : <span className="text-t3 font-normal italic">Never</span>}
                       </td>
                       <td className="px-6 py-4 text-right">
-                        {filterType === "INFLUENCER" ? (
-                          <button
-                            onClick={() => onViewLinks?.(item)}
-                            className="px-3 py-1.5 bg-s2 hover:bg-s3 text-lime/80 hover:text-lime border border-border/60 hover:border-lime/30 transition duration-200 rounded-lg text-xs font-semibold"
-                          >
-                            View Coupons
-                          </button>
-                        ) : (
-                          <button
-                            onClick={() => onEditUser?.(item)}
-                            className="px-3 py-1.5 bg-s2 hover:bg-s3 text-t2 hover:text-t1 border border-border/60 hover:border-border transition duration-200 rounded-lg text-xs font-semibold"
-                          >
-                            Edit User
-                          </button>
-                        )}
+                        <div className="flex items-center justify-end gap-2">
+                          {filterType === "INFLUENCER" ? (
+                            <button
+                              onClick={() => onViewLinks?.(item)}
+                              className="px-3 py-1.5 bg-s2 hover:bg-s3 text-lime/80 hover:text-lime border border-border/60 hover:border-lime/30 transition duration-200 rounded-lg text-xs font-semibold"
+                            >
+                              View Coupons
+                            </button>
+                          ) : (
+                            <button
+                              onClick={() => onEditUser?.(item)}
+                              className="px-3 py-1.5 bg-s2 hover:bg-s3 text-t2 hover:text-t1 border border-border/60 hover:border-border transition duration-200 rounded-lg text-xs font-semibold"
+                            >
+                              Edit User
+                            </button>
+                          )}
+                          {onDeleteUser && (
+                            <button
+                              onClick={() => onDeleteUser(item)}
+                              title="Delete user"
+                              aria-label={`Delete ${item.name}`}
+                              className="p-1.5 bg-s2 hover:bg-red/10 text-t3 hover:text-red border border-border/60 hover:border-red/30 transition duration-200 rounded-lg"
+                            >
+                              <Trash2 size={15} />
+                            </button>
+                          )}
+                        </div>
                       </td>
                     </tr>
                   );

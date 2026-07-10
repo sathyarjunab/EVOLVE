@@ -17,7 +17,7 @@ export async function getUser() {
   }
 }
 
-export async function getToken(payload: Partial<UserModel>) {
+export async function getToken(payload: Partial<Omit<UserModel, "password">>) {
   return await new jose.SignJWT(payload)
     .setProtectedHeader({ alg: "HS256" })
     .setIssuedAt()

@@ -15,7 +15,7 @@ export interface UserRecord {
   influencerShare: number | string;
 }
 
-export type TabType = "dashboard" | "users" | "influencers" | "add_link";
+export type TabType = "dashboard" | "users" | "create_user" | "influencers" | "add_link";
 
 export const formatDate = (dateString: string | null): string => {
   if (!dateString) return "Never";

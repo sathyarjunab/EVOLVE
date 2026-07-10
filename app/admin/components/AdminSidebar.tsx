@@ -3,6 +3,7 @@
 import {
   LayoutDashboard,
   Users,
+  UserPlus,
   Link2,
   LogOut,
   X,
@@ -35,6 +36,7 @@ export default function AdminSidebar({
       icon: <LayoutDashboard size={18} />,
     },
     { tab: "users", label: "List Users", icon: <Users size={18} /> },
+    { tab: "create_user", label: "Create User", icon: <UserPlus size={18} /> },
     {
       tab: "influencers",
       label: "List Influencer",

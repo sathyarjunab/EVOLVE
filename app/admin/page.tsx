@@ -9,8 +9,10 @@ import { TabType, UserRecord } from "./components/types";
 import AdminSidebar from "./components/AdminSidebar";
 import DashboardView from "./components/DashboardView";
 import ListUsersView from "./components/ListUsersView";
+import CreateUserView from "./components/CreateUserView";
 import ViewLinksModal from "./components/ViewLinksModal";
 import EditUserModal from "./components/EditUserModal";
+import DeleteUserModal from "./components/DeleteUserModal";
 import AddLinkView from "./components/AddLinkView";
 
 export default function AdminPage() {
@@ -41,6 +43,7 @@ export default function AdminPage() {
   // Modal state
   const [editingUser, setEditingUser] = useState<UserRecord | null>(null);
   const [viewingLinksInfluencer, setViewingLinksInfluencer] = useState<UserRecord | null>(null);
+  const [deletingUser, setDeletingUser] = useState<UserRecord | null>(null);
 
   // Debounce search input
   useEffect(() => {
@@ -196,6 +199,17 @@ export default function AdminPage() {
             fetching={fetching}
             fetchUsers={fetchUsers}
             onEditUser={setEditingUser}
+            onDeleteUser={setDeletingUser}
+          />
+        )}
+
+        {activeTab === "create_user" && (
+          <CreateUserView
+            onCreated={() => {
+              // Refresh the cached list so the new user is present when the
+              // admin navigates back to "List Users".
+              fetchUsers();
+            }}
           />
         )}
 
@@ -213,6 +227,7 @@ export default function AdminPage() {
             fetching={fetching}
             fetchUsers={fetchUsers}
             onViewLinks={setViewingLinksInfluencer}
+            onDeleteUser={setDeletingUser}
             filterType="INFLUENCER"
           />
         )}
@@ -237,6 +252,19 @@ export default function AdminPage() {
         <ViewLinksModal
           influencer={viewingLinksInfluencer}
           onClose={() => setViewingLinksInfluencer(null)}
+        />
+      )}
+
+      {/* Delete user confirmation modal */}
+      {deletingUser && (
+        <DeleteUserModal
+          user={deletingUser}
+          onClose={() => setDeletingUser(null)}
+          onDeleted={(id) => {
+            setUsers((prev) => prev.filter((u) => u.id !== id));
+            setTotalCount((prev) => Math.max(0, prev - 1));
+            setDeletingUser(null);
+          }}
         />
       )}
     </div>

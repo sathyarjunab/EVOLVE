@@ -38,7 +38,16 @@ export default async function signup(name: string, email: string, password: stri
             }
         })
 
-        const token = await getToken(newUser);
+        // Sign only a minimal, JSON-safe payload (same shape login uses).
+        // Passing the raw Prisma record here throws inside jose.SignJWT
+        // (non-plain object + Decimal/Date fields) — which previously left
+        // the user created but surfaced a generic "Something went wrong".
+        const token = await getToken({
+            id: newUser.id,
+            email: newUser.email,
+            name: newUser.name,
+            access: newUser.access,
+        });
 
         (await cookies()).set('token', token, {
             httpOnly: true,
